@@ -14,9 +14,6 @@ import messages from '../data/messages.json'
 
 const ChatScreen = ({route, navigation}: any) => {
 
-  // const route = useRoute();
-  // const navigation = useNavigation();
-
   // useEffect(() => {
   //   navigation.setOptions({ 
   //     title: route.params.name 
@@ -28,13 +25,12 @@ const ChatScreen = ({route, navigation}: any) => {
     transports: ['websocket'],
   });
 
-  const [name, setName] = useState<any>('Your Name');
+  const [name, setName] = useState<any>(route.params.name);
   const [message, setMessage] = useState('');
   const [chatroom, setChatroom] = useState<any[]>([]);
 
   useEffect(()=>{
-    // When connected, emit a message to the server to inform that this client has connected to the server.
-    // Display a Toast to inform user that connection was made.
+
     socket.on('connect', () => {
 
       console.log(socket.id); // undefined
