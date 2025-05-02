@@ -25,6 +25,11 @@ const Drawer = createDrawerNavigator();
 const MyDrawerComponent = (props) => {
 
   const { user } = useContext(AuthContext);
+  const { logout } = useContext(AuthContext);
+  // const { logout } = useContext();
+  const handleLogout = async () => {
+    await logout();
+  }
   
     return (
       <View style={{flex: 1}}>
@@ -114,7 +119,10 @@ const MyDrawerComponent = (props) => {
               </Text>
             </View>
           </TouchableOpacity>
-          <TouchableOpacity style={{paddingVertical: 10}}>
+          <TouchableOpacity 
+            style={{paddingVertical: 10}}
+            onPress={handleLogout}
+          >
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
               <Ionicons name="exit-outline" size={20} />
               <Text
