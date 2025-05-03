@@ -3,17 +3,27 @@ import React, { useRef, useState } from 'react';
 import { TextInput } from 'react-native-gesture-handler';
 import SignUp from './SignUp';
 import Loading from '../components/Loading';
+import { useAuth } from '../contexts/AuthContext';
 
 const SignIn = ({route, navigation}: any) => {
 
   const emailRef = useRef("");
   const passwordRef = useRef("");
   const [isLoading, setIsLoading] = useState(false);
+  const {login} = useAuth();
 
   const handleLogin = async () => {
     if(!emailRef.current || !passwordRef.current) {
       Alert.alert("Sign In", "Please fill in all fields");
       return;
+    }
+
+    setIsLoading(true);
+    const response = await login(emailRef.current, passwordRef.current);
+    setIsLoading(false);
+    console.log("Sign in response: " + response);
+    if(!response.success) {
+      Alert.alert("Sign In", response.message);
     }
   }
 

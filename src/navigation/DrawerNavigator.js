@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useAuth, useState, useEffect } from "react";
 import { Image,
     View,
     Text,
@@ -7,9 +7,8 @@ import { Image,
      } from "react-native";
 import { createDrawerNavigator, DrawerContentScrollView,
     DrawerItemList, } from '@react-navigation/drawer';
-    import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
-
-    import { AuthContext } from '../contexts/AuthContext';
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
+import { AuthContext } from '../contexts/AuthContext';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
 
@@ -18,6 +17,8 @@ import ProfileScreen from '../screens/ProfileScreen';
 import ChatsScreen from '../screens/ChatsScreen';
 import BottomTabNavigator from "./BottomTabNavigator";
 import NotificationScreen from '../screens/NotificationScreen';
+import { usersRef } from "../../firebaseConfig";
+import { where, query, getDocs } from "firebase/firestore";
 
 
 const Drawer = createDrawerNavigator();
@@ -26,10 +27,14 @@ const MyDrawerComponent = (props) => {
 
   const { user } = useContext(AuthContext);
   const { logout } = useContext(AuthContext);
+// const {user, logout} = useAuth();
+
   // const { logout } = useContext();
   const handleLogout = async () => {
     await logout();
   }
+
+  console.log('user', user);
   
     return (
       <View style={{flex: 1}}>
@@ -38,7 +43,7 @@ const MyDrawerComponent = (props) => {
           contentContainerStyle={{backgroundColor: 'skyblue'}}
         >
           <ImageBackground
-            source={{ uri: user?.image || 'https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg' }}
+            source={{ uri: user?.profileUrl || 'https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg' }}
             style={{padding: 10}}
           >
             <Image
@@ -49,7 +54,7 @@ const MyDrawerComponent = (props) => {
                 marginLeft: 20,
                 borderRadius: 32,
               }}
-              source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg' }}
+              source={{ uri: user?.profileUrl || 'https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg' }}
             />
             <Text
               style={{
@@ -60,7 +65,7 @@ const MyDrawerComponent = (props) => {
                 marginLeft: 20,
               }}
             >
-              User
+              {user?.username || 'Username'}
             </Text>
 
             <View style={{flexDirection: 'row', alignSelf: 'flex-end'}}>
@@ -143,6 +148,38 @@ const MyDrawerComponent = (props) => {
   }
 
 const DrawerNavigator = () => {
+  const [users, setUsers] = useState([]);
+  const { user } = useContext(AuthContext);
+
+  
+  const getUsers = async () => {
+    
+    try {
+      const q = query(usersRef, where('userId', '!=', user?.uid)); // fetch all users except the current user
+
+      const querySnapshot = await getDocs(q);
+      let data = [];
+      querySnapshot.forEach((doc) => {
+        data.push({...doc.data()});
+    });
+
+    
+    setUsers(data);
+    console.log('users: ', users);
+    } catch (error) {
+      console.error('Error getting users:', error);
+    }
+  }
+
+  console.log('get users called');
+  console.log('get users: ', users);
+
+  useEffect(() => {
+    if(user?.uid){
+      getUsers();
+    }
+  },[user]) // ensure getUsers() runs only after the user is available
+
   return (
     <Drawer.Navigator
             drawerContent={props => <MyDrawerComponent {...props} />}
@@ -204,14 +241,17 @@ const DrawerNavigator = () => {
                 ),
               }}
         />
-        <Drawer.Screen name="Chats"
-        component={ChatsScreen}
-        options={{
-            drawerIcon: ({color}) => (
-                <Feather name="message-circle" size={24} color={color} />
-            ),
-          }}
-        />
+        <Drawer.Screen
+  name="Chats"
+  options={{
+    drawerIcon: ({ color }) => (
+      <Feather name="message-circle" size={24} color={color} />
+    ),
+  }}
+>
+  {(props) => <ChatsScreen {...props} users={users} />}
+</Drawer.Screen>
+    
   </Drawer.Navigator>
   );
 }

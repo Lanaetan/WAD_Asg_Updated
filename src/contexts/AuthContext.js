@@ -1,6 +1,6 @@
-import { createUserWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth';
+import { createUserWithEmailAndPassword, onAuthStateChanged, signOut, signInWithEmailAndPassword } from 'firebase/auth';
 import React, { createContext, useEffect, useState, useContext } from 'react';
-import { doc, addDoc, setDoc } from 'firebase/firestore';
+import { doc, addDoc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../../firebaseConfig'; 
 
 
@@ -19,6 +19,7 @@ export const AuthProvider = ({ children }) => {
       if (user) {
         setUser(user);
         setIsAuthenticated(true);
+        updateUserData(user.uid); // Call the function to update user data in Firestore
       } else {
         setUser(null);
         setIsAuthenticated(false);
@@ -32,19 +33,46 @@ export const AuthProvider = ({ children }) => {
     
   },[]);
 
+  const updateUserData = async (userId) => {
+    const docRef = doc(db, "users", userId);
+    const docSnap = await getDoc(docRef);
+
+    if(docSnap.exists()) {
+      let data = docSnap.data();
+      setUser({
+        ...user,
+        username: data.username,
+        profileUrl: data.profileUrl,
+        userId: data.userId,
+      });
+    }
+  }
+
   const login = async (email, password) => {
     try{
-
+      const response = await signInWithEmailAndPassword(auth, email, password);
+      return {success: true};
     }catch (error) {
       console.error('Login error:', error);
+      let message = error.message;
+      if(message.includes('auth/invalid-email')) {
+        message = 'Invalid email.';
+      }
+      if(message.includes('auth/invalid-credentials')) {
+        message = 'Wrong credentials.';
+      }
+      return { success: false, message: message }; 
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
     try{
       console.log('Logging out...');
+      await auth.signOut();
+      return {success: true};
     }catch (error) {
       console.error('Logout error:', error);
+      return {success: false, message: error.message, error: error};
     }
   };
 
@@ -65,7 +93,13 @@ export const AuthProvider = ({ children }) => {
       if(message.includes('auth/invalid-email')) {
         message = 'Invalid email.';
       }
-      return { success: false, message: message }; // Add this line
+      if(message.includes('auth/email-already-in-use')) {
+        message = 'Email already in use.';
+      }
+      if(message.includes('auth/weak-password')) {
+        message = 'Password should be at least 6 characters.';
+      }
+      return { success: false, message: message }; 
     }
   };
 

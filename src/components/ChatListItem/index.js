@@ -6,22 +6,49 @@ import relativeTime from "dayjs/plugin/relativeTime";
 
 dayjs.extend(relativeTime);
 
-const ChatListItem = ({ chat }) => {
+const ChatListItem = ({ chat, index, noBorder }) => {
   const navigation = useNavigation();
+  const image = chat?.profileUrl || 'https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg';
+  const name = chat?.username || 'Username';
+
+
+  const openChatRoom = () => {
+    navigation.navigate('Chat', { 
+      id: chat.uid, 
+      name: chat.name, 
+      image: chat.profileUrl 
+    });
+  }
 
   return (
-    <Pressable onPress={() => navigation.navigate('Chat', { id: chat.id, name: chat.user.name, image: chat.user.image })} style={styles.container}>
-      <Image source={{ uri: chat.user.image }} style={styles.image} />
+
+    <Pressable onPress={() => openChatRoom()} 
+      style={styles.container}>
+      <Image source={{ uri: image }} style={styles.image} />
       <View style={styles.content}>
         <View style={styles.row}>
-          <Text numberOfLines={1} style={styles.name}>{chat.user.name}</Text>
-          <Text style={styles.subTitle}>{dayjs(chat.lastMessage.createdAt).fromNow()}</Text>
+          <Text numberOfLines={1} 
+            style={styles.name}>
+              {name}</Text>
+          {/* <Text style={styles.subTitle}>{dayjs(chat.lastMessage.createdAt).fromNow()}</Text> */}
         </View>
 
-        <Text numberOfLines={2} style={styles.subTitle}>{chat.lastMessage.text}</Text>
+        {/* <Text numberOfLines={2} style={styles.subTitle}>{chat.lastMessage.text}</Text> */}
       </View>
     </Pressable>
-  );
+
+    // <Pressable onPress={() => navigation.navigate('Chat', { id: chat.id, name: chat.user.name, image: chat.user.image })} style={styles.container}>
+    //   <Image source={{ uri: chat.user.image }} style={styles.image} />
+    //   <View style={styles.content}>
+    //     <View style={styles.row}>
+    //       <Text numberOfLines={1} style={styles.name}>{chat.user.name}</Text>
+    //       <Text style={styles.subTitle}>{dayjs(chat.lastMessage.createdAt).fromNow()}</Text>
+    //     </View>
+
+    //     <Text numberOfLines={2} style={styles.subTitle}>{chat.lastMessage.text}</Text>
+    //   </View>
+    // </Pressable>
+  )
 }
 
 const styles = StyleSheet.create({
@@ -29,12 +56,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginHorizontal: 10,
     marginVertical: 5,
-    height: 70,
+    height: 60,
     alignItems: 'center',
   },
   image: {
-    width: 60,
-    height: 60,
+    width: 55,
+    height: 55,
     borderRadius: 30,
     marginRight: 10,
   },

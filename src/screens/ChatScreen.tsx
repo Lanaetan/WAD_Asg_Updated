@@ -2,17 +2,16 @@ import React, { useEffect, useState } from "react";
 import { Text, View, ImageBackground, StyleSheet, FlatList, TextInput, Image, ToastAndroid } from "react-native";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import io from 'socket.io-client';
-// import io from 'socket.io-client/dist/socket.io';
-
 
 import Message from "../components/Message";
 import InputBox from "../components/InputBox";
 
-// import bg from '../assets/images/luguang.jpg';
 import messages from '../data/messages.json'
 
 
 const ChatScreen = ({route, navigation}: any) => {
+
+  const { uid, username, image } = route.params;
 
   // useEffect(() => {
   //   navigation.setOptions({ 
@@ -25,61 +24,68 @@ const ChatScreen = ({route, navigation}: any) => {
     transports: ['websocket'],
   });
 
-  const [name, setName] = useState<any>(route.params.name);
+  // const [name, setName] = useState<any>(route.params.username);
   const [message, setMessage] = useState('');
   const [chatroom, setChatroom] = useState<any[]>([]);
 
-  useEffect(()=>{
+  const [messages, setMessages] = useState<any[]>([]);
 
-    socket.on('connect', () => {
+  // useEffect(()=>{
 
-      console.log(socket.id); // undefined
-      socket.emit('mobile_client_connected', {connected: true}, (response: any)=>{
-        console.log(response)
-      });
-      ToastAndroid.show('Connected to server', ToastAndroid.LONG);
-    });
+  //   socket.on('connect', () => {
 
-    socket.on('connect_to_client', (data: any) => {
-      let greets=JSON.parse(data)
-      console.log(greets)
-    });
+  //     console.log(socket.id); // undefined
+  //     socket.emit('mobile_client_connected', {connected: true}, (response: any)=>{
+  //       console.log(response)
+  //     });
+  //     ToastAndroid.show('Connected to server', ToastAndroid.LONG);
+  //   });
 
-    // Handle connection error
-    socket.on('error', (error: any) => {
-        ToastAndroid.show('Failed to connect to server', ToastAndroid.LONG);
-    });
+  //   socket.on('connect_to_client', (data: any) => {
+  //     let greets=JSON.parse(data)
+  //     console.log(greets)
+  //   });
 
-    // Receive chat broadcast from server.
-    socket.on('message_broadcast', (data:any) => {
-      console.log(data);
-      let messageBag = JSON.parse(data);
+  //   // Handle connection error
+  //   socket.on('error', (error: any) => {
+  //       ToastAndroid.show('Failed to connect to server', ToastAndroid.LONG);
+  //   });
 
-      setChatroom(chatroom => [...chatroom, messageBag]);
-    });
-  },[]);
+  //   // Receive chat broadcast from server.
+  //   socket.on('message_broadcast', (data:any) => {
+  //     console.log(data);
+  //     let messageBag = JSON.parse(data);
+
+  //     setChatroom(chatroom => [...chatroom, messageBag]);
+  //   });
+  // },[]);
 
   useEffect(() => {
       navigation.setOptions({ 
         headerTitle: () => (
           <View style={styles.container}>
-            <Image style={styles.image} source={{ uri: route.params.image }}/>
-            <Text style={styles.name}>{ route.params.name }</Text>
+            <Image style={styles.image} source={{ uri: image }}/>
+            <Text style={styles.name}>{ username }</Text>
           </View>
         )
       });
-    }, [route.params?.name]);
+    }, [username]);
  
 
     return(
       <View style={styles.bg}>
-        <FlatList
+         <View style={styles.messagesContainer}>
+          <Message message={messages} user={username}/>
+        {/* <FlatList
           // data={messages}
           data={chatroom}
           renderItem={({item}) => <Message message={item} user={name}/>}
-        />
-        <InputBox
-/>
+        /> */}
+
+        {/* Input Box at Bottom */}
+        
+         </View>
+         <InputBox />
       </View>
     )
 }
@@ -88,6 +94,10 @@ const styles = StyleSheet.create({
   bg: {
     flex: 1,
     backgroundColor: '#e3e6e5',
+  },
+  messagesContainer: {
+    flex: 1,
+    paddingBottom: 10, // space above the input box
   },
   container: {
     flexDirection: 'row',

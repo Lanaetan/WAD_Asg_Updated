@@ -1,16 +1,23 @@
 import React from "react";
-import {Text,View, FlatList} from "react-native";
+import {Text,View, FlatList, StatusBar} from "react-native";
 import chats from '../data/chats.json';
 import ChatListItem from "../components/ChatListItem";
 
-const ChatsScreen = () => {
+
+const ChatsScreen = ({users}: any) => {
+
+  console.log("Users: ", users);
+  
     return(
       <View>
+        {/* <StatusBar style="light" /> */}
         <FlatList 
-          data={chats}
-          renderItem={({ item }) => 
-            <ChatListItem chat={item} />
+          data={users}
+          renderItem={({ item, index }) => 
+            <ChatListItem noBorder={index+1 == users.length} chat={item} index={index}/>
           }
+          // keyExtractor={(item) => item.uid.toString()}
+          showsVerticalScrollIndicator={false}
         />
       </View>
     )
