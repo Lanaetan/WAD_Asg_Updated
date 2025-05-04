@@ -16,53 +16,48 @@ import MessageList from "./MessageList";
 
 const ChatScreen = ({route, navigation}: any) => {
 
-  const { id, username, image } = route.params;
-  const { user } = useAuth(); // logged in user
-  const [messages, setMessages] = useState<any[]>([]);
-  const textRef = useRef<string>('');
-  const inputRef = useRef<any>(null);
-
-
-  useEffect(() => {
-    createRoomIfNotExists();
-
-    let roomId = getRoomId(user?.userId, id);
-    const docRef = doc(db, 'rooms', roomId);
-    const messagesRef = collection(docRef, 'messages');
-    const q = query(messagesRef, orderBy('createdAt', 'asc'));
-
-    let unsub = onSnapshot(q, (querySnapshot) => {
-      // let allMessages: any[] = [];
-      // querySnapshot.forEach((doc) => {
-      //   allMessages.push(doc.data());
-      // });
-      // setMessages(messages);
-      let allMessages = querySnapshot.docs.map(doc => {
-        return doc.data();
-      });
-      setMessages({ ...allMessages });
-    }
-  )
-  },[user])
-
-  const createRoomIfNotExists = async () => {
-    let roomId = getRoomId(user?.userId, id);
-    console.log("user uid: ", user?.userId);
-    console.log("Room ID: ", roomId);
-    console.log("Chat ID: ", id);
-    await setDoc(doc(db, 'rooms', roomId), {
-      roomId,
-      createdAt: Timestamp.fromDate(new Date()),
-    });
-  }
-  
-  
+  // FIREBASE ==========
+  // const { id, username, image } = route.params;
+  // const { user } = useAuth();
+  // const [messages, setMessages] = useState<any[]>([]);
+  // const textRef = useRef<string>('');
+  // const inputRef = useRef<any>(null);
 
   // useEffect(() => {
-  //   navigation.setOptions({ 
-  //     title: route.params.name 
+  //   createRoomIfNotExists();
+
+  //   let roomId = getRoomId(user?.userId, id);
+  //   const docRef = doc(db, 'rooms', roomId);
+  //   const messagesRef = collection(docRef, 'messages');
+  //   const q = query(messagesRef, orderBy('createdAt', 'asc'));
+
+  //   let unsub = onSnapshot(q, (querySnapshot) => {
+  //     let allMessages = querySnapshot.docs.map(doc => {
+  //       return doc.data();
+  //     });
+  //     setMessages({ ...allMessages });
+  //   }
+  // )
+  // },[user])
+
+  // const createRoomIfNotExists = async () => {
+  //   let roomId = getRoomId(user?.userId, id);
+  //   console.log("user uid: ", user?.userId);
+  //   console.log("Room ID: ", roomId);
+  //   console.log("Chat ID: ", id);
+  //   await setDoc(doc(db, 'rooms', roomId), {
+  //     roomId,
+  //     createdAt: Timestamp.fromDate(new Date()),
   //   });
-  // }, [route.params?.name]);
+  // }
+  
+  
+
+  useEffect(() => {
+    navigation.setOptions({ 
+      title: route.params.name 
+    });
+  }, [route.params?.name]);
 
   // if using emulator, paste this: http://10.0.2.2:5000/chat
   var socket = io('http://192.168.0.14:5000/chat', {
@@ -99,6 +94,8 @@ const ChatScreen = ({route, navigation}: any) => {
   //   });
   // },[]);
 
+  const { id, username, image } = route.params;
+
   useEffect(() => {
       navigation.setOptions({ 
         headerTitle: () => (
@@ -110,70 +107,52 @@ const ChatScreen = ({route, navigation}: any) => {
       });
     }, [username]);
 
-    const handleSendMessage = async () => {
-      let message = textRef.current.trim();
-      if (!message) return; // Prevent sending empty messages
-      try{
-        let roomId = getRoomId(user?.userId, id);
-        const docRef = doc(db, 'rooms', roomId);
-        const messagesRef = collection(docRef, 'messages');
-        textRef.current = ''; // Clear the input field after sending the message
-        if (inputRef.current) {
-          inputRef?.current?.clear(); // Clear the input field after sending the message
-        }
+    // const handleSendMessage = async () => {
+    //   let message = textRef.current.trim();
+    //   if (!message) return; // Prevent sending empty messages
+    //   try{
+    //     let roomId = getRoomId(user?.userId, id);
+    //     const docRef = doc(db, 'rooms', roomId);
+    //     const messagesRef = collection(docRef, 'messages');
+    //     textRef.current = ''; // Clear the input field after sending the message
+    //     if (inputRef.current) {
+    //       inputRef?.current?.clear(); // Clear the input field after sending the message
+    //     }
 
-        
-        const newDoc = await addDoc(messagesRef, {
-          userId: user?.userId,
-          text: message,
-          profileUrl: user?.profileUrl,
-          senderName: user?.username,
-          createdAt: Timestamp.fromDate(new Date()),
-        });
-        console.log('new message id: ', newDoc.id);
-        console.log('new message: ', message);
-      }catch(error: any){
-        Alert.alert("Message", error.message)
-      }
-    }
-
-    console.log("Messages: ", messages);
+    //     const newDoc = await addDoc(messagesRef, {
+    //       userId: user?.userId,
+    //       text: message,
+    //       profileUrl: user?.profileUrl,
+    //       senderName: user?.username,
+    //       createdAt: Timestamp.fromDate(new Date()),
+    //     });
+    //   }catch(error: any){
+    //     Alert.alert("Message", error.message)
+    //   }
+    // }
 
     return(
       <View style={styles.bg}>cd 
          <View style={styles.messagesContainer}>
-          <MessageList messages={messages} currentUser={user} />
-        {/* <FlatList
-          // data={messages}
-          data={chatroom}
-          renderItem={({item}) => <Message message={item} user={name}/>}
-        /> */}
-
-        {/* Input Box at Bottom */}
-        
+          <MessageList messages={messages} currentUser={user} />     
          </View>
-         {/* <InputBox 
-          onChangeText={handleTextChange}
-          value={textRef.current}
-          onSendMessage={handleSendMessage}
-        /> */}
+
         <SafeAreaView style={styles.inputContainer}>
-              {/* Icon */}
-              <Feather name="plus" size={24} color='#37b0b0' />
-        
-              {/* Text Input */}
-              <TextInput 
-                ref={inputRef}
-                onChangeText={value=>textRef.current = value}
-                style={styles.input} 
-                placeholder="Type your message..."></TextInput>
-        
-              {/* Icon */}
-              <TouchableOpacity onPress={handleSendMessage}>
-                <Feather style={styles.send} name="send" size={22} color='white' />
-              </TouchableOpacity>
-              
-            </SafeAreaView>
+          {/* Icon */}
+          <Feather name="plus" size={24} color='#37b0b0' />
+    
+          {/* Text Input */}
+          <TextInput 
+            ref={inputRef}
+            onChangeText={value=>textRef.current = value}
+            style={styles.input} 
+            placeholder="Type your message..."></TextInput>
+    
+          {/* Icon */}
+          <TouchableOpacity onPress={handleSendMessage}>
+            <Feather style={styles.send} name="send" size={22} color='white' />
+          </TouchableOpacity>
+        </SafeAreaView>
       </View>
     )
 }

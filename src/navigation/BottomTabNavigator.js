@@ -11,7 +11,7 @@ import CreatePostScreen from '../screens/CreatePostScreen';
 import ChatsScreen from '../screens/ChatsScreen';
 import LoginScreen from '../screens/TestLoginScreen';
 import TestDbScreen from '../screens/TestDbScreen';
-
+import TestChatScreen from '../screens/TestChatScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -102,6 +102,20 @@ const BottomTabNavigator = () => {
           },
         }}
       />
+      <Tab.Screen
+        name="TestChat"
+        component={TestChatScreen}
+         options={{
+          headerTitle: 'Login',
+          headerTitleStyle: {
+            // fontFamily: "PTSans-Bold",
+          },
+          tabBarIcon: ({ color }) => {
+            return <Feather name="user" size={24} color={ color } />;
+          },
+        }}
+      />
+      
     </Tab.Navigator>
   );
 }

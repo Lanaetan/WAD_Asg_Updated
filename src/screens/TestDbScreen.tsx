@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 import { View, Text, Button, FlatList, StyleSheet } from 'react-native';
 import { AuthContext } from '../contexts/AuthContext';
-import { getDBConnection, getUserById } from '../db-service/userService';
+import { getDBConnection, getUserById, getUsers, getUsersExceptCurrent } from '../db-service/userService';
 // let common = require('../CommonData');
 let SQLite = require('react-native-sqlite-storage');
 
@@ -16,26 +16,35 @@ console.log('Error in opening the database: ' + err);
 const TestDbScreen = ({ navigation }: any) => {
   
     const [students, setStudents] = useState<any>([]);
+    const [users, setUsers] = useState<any>([]);
 
-    let db = SQLite.openDatabase(
-        {name: 'db.sqlite', createFromLocation: '~db.sqlite'},
-        openCallback,
-        errorCallback,
-    )
+    // let db = SQLite.openDatabase(
+    //     {name: 'db.sqlite', createFromLocation: '~db.sqlite'},
+    //     openCallback,
+    //     errorCallback,
+    // )
 
-  const _query = () => {
-    try{
-        const studentData:any = [];
-        db.executeSql('SELECT * FROM users ORDER BY name',[], (results:any) => {
-          (results.rows.raw()).forEach(( item:any ) => {
-            studentData.push(item);
-          })
-          setStudents(studentData);
-        });
-      } catch (error) {
+  const _query = async () => {
+    // try{
+    //     const studentData:any = [];
+    //     db.executeSql('SELECT * FROM users ORDER BY name',[], (results:any) => {
+    //       (results.rows.raw()).forEach(( item:any ) => {
+    //         studentData.push(item);
+    //       })
+    //       setStudents(studentData);
+    //     });
+    //   } catch (error) {
+    //     console.error(error);
+    //     throw Error('Failed to get students !!!');
+    //   }
+
+      try{
+        setUsers(await getUsersExceptCurrent(await getDBConnection(), '1'));
+      }catch (error) {
         console.error(error);
-        throw Error('Failed to get students !!!');
+        throw Error('Failed to get users except current logged in user !!!');
       }
+      console.log("users in sqlite: ", users);
   }
 
   useEffect(()=>{
@@ -45,9 +54,8 @@ const TestDbScreen = ({ navigation }: any) => {
 
   return (
     <View>
-        <Text>Hello</Text>
         <FlatList
-          data={students}
+          data={users}
           showsVerticalScrollIndicator={true}
           renderItem={({item}:any) => (
               <View style={styles.item}>

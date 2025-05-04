@@ -6,29 +6,25 @@ import { AuthProvider, useAuth } from './src/contexts/AuthContext'; // if you're
 const App = () => {
   return (
     <AuthProvider>
-      <Root />
+      <Navigator />
     </AuthProvider>
   );
 };
 
-const Root = () => {
-  const { loading } = useAuth();
+// const Root = () => {
+//   const { loading } = useAuth();
 
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#0000ff" style={styles.load} />
-        <Text>Authenticating...</Text>
-      </View>
-    );
-  }
+//   if (loading) {
+//     return (
+//       <View style={styles.container}>
+//         {/* <ActivityIndicator size="large" color="#0000ff" style={styles.load} />
+//         <Text>Authenticating...</Text> */}
+//       </View>
+//     );
+//   }
 
-  return <Navigator />;
-};
-
-
-
-
+//   return <Navigator />;
+// };
 
 export default App;
 

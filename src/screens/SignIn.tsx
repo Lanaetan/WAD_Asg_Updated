@@ -18,12 +18,20 @@ const SignIn = ({route, navigation}: any) => {
       return;
     }
 
+    // setIsLoading(true);
+    // const response = await login(emailRef.current, passwordRef.current);
+    // setIsLoading(false);
+    // console.log("Sign in response: " + response);
+    // if(!response.success) {
+    //   Alert.alert("Sign In", response.message);
+    // }
+
     setIsLoading(true);
-    const response = await login(emailRef.current, passwordRef.current);
+    const success = await login(emailRef.current, passwordRef.current);
     setIsLoading(false);
-    console.log("Sign in response: " + response);
-    if(!response.success) {
-      Alert.alert("Sign In", response.message);
+    console.log("Sign in response: " + success);
+    if (!success) {
+      Alert.alert("Sign In", "Invalid email or password");
     }
   }
 
@@ -44,32 +52,25 @@ const SignIn = ({route, navigation}: any) => {
       <Text>Forgot password?</Text>
 
       {/* submit button */}
-    <View>
-      {
-        isLoading? (
-          <View>
-            {/* <Loading /> */}
-            <Text>Loading...</Text>
-
-          </View>
-        ) : (
-          
-          <TouchableOpacity onPress={handleLogin}>
-        <Text>Sign In</Text>
-      </TouchableOpacity>
-        )
-      }
-    </View>
-
-      
-
-      {/* sign up test */}
-      <Text>Don't have an account?</Text>
-      <Pressable onPress={() => navigation.navigate('SignUp')}>
-        <Text>Sign Up</Text>
-      </Pressable>
-     
-      
+      <View>
+        {
+          isLoading? (
+            <View>
+              <Text>Loading...</Text>
+            </View>
+          ) : (
+            
+            <TouchableOpacity onPress={handleLogin}>
+              <Text>Sign In</Text>
+            </TouchableOpacity>
+          )
+        }
+      </View>
+        {/* sign up test */}
+        <Text>Don't have an account?</Text>
+        <Pressable onPress={() => navigation.navigate('SignUp')}>
+          <Text>Sign Up</Text>
+        </Pressable>
     </View>
   );
 }

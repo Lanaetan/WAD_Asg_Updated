@@ -1,22 +1,15 @@
 import {SQLiteDatabase, enablePromise, openDatabase} from 'react-native-sqlite-storage';
 
-const databaseName = 'myplaces.sqlite';
+const databaseName = 'db.sqlite';
 
 // Enable promise for SQLite
 enablePromise(true);
 
 export const getDBConnection = async() => {
     return openDatabase(
-        {
-            name: 'myplaces.sqlite',
-            createFromLocation: 1         
-        },
-          openCallback,
-          errorCallback
-        
-        // {name: `${databaseName}`, createFromLocation: '~db.sqlite'},
-        // openCallback,
-        // errorCallback,
+        {name: `${databaseName}`, createFromLocation: '~db.sqlite'},
+        openCallback,
+        errorCallback,
     );
 }
 
@@ -26,7 +19,7 @@ export const getUsers = async( db: SQLiteDatabase ): Promise<any> => {
         const usersData : any = [];
         const query = `SELECT * FROM users ORDER BY name`;
         const results = await db.executeSql(query);
-        results.forEach(result => {
+        results.forEach((result: any) => {
             (result.rows.raw()).forEach(( item:any ) => {
                 usersData.push(item);
             })
@@ -37,6 +30,28 @@ export const getUsers = async( db: SQLiteDatabase ): Promise<any> => {
         throw Error('Failed to get users !!!');
       }
 }
+
+
+export const getUsersExceptCurrent = async (
+  db: SQLiteDatabase,
+  currentUserId: string
+): Promise<any[]> => {
+  try {
+    const usersData: any[] = [];
+    const query = `SELECT * FROM users WHERE id != ? ORDER BY name`;
+    const results = await db.executeSql(query, [currentUserId]);
+
+    results.forEach((result: any) => {
+      result.rows.raw().forEach((item: any) => {
+        usersData.push(item);
+      });
+    });
+    return usersData;
+  } catch (error) {
+    console.error(error);
+    throw Error('Failed to get users excluding current user!');
+  }
+};
 
 
 export const getUserById = async( db: SQLiteDatabase, userId: string ): Promise<any> => {
@@ -50,6 +65,21 @@ export const getUserById = async( db: SQLiteDatabase, userId: string ): Promise<
         throw Error('Failed to get user !!!');
       }
 }
+
+
+export const getUserByEmail = async( db: SQLiteDatabase, email: string ): Promise<any> => {
+  try{
+      const userData : any = [];
+      const query = `SELECT * FROM users WHERE email=?`;
+      const results = await db.executeSql(query,[email]);
+      return results[0].rows.item(0)
+    } catch (error) {
+      console.error(error);
+      throw Error('Failed to get user !!!');
+    }
+}
+
+
 
 
 export const createUser = async( 

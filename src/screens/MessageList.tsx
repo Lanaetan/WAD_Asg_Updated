@@ -16,7 +16,7 @@ const MessageList = ({ messages = {}, currentUser }: any) => {
           {messageArray.map((message: any, index: any) => (
             <Message message={message} key={index} currentUser={currentUser} />
           ))}
-          <Text>hello</Text>
+          
         </ScrollView>
       );
 }
