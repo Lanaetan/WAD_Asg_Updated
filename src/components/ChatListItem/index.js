@@ -13,9 +13,10 @@ const ChatListItem = ({ chat, index, noBorder }) => {
 
 
   const openChatRoom = () => {
+    // console.log('ChatListItem', chat);
     navigation.navigate('Chat', { 
-      id: chat.uid, 
-      name: chat.name, 
+      id: chat.userId, 
+      username: chat.username, 
       image: chat.profileUrl 
     });
   }

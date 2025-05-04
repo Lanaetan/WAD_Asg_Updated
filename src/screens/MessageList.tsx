@@ -3,32 +3,24 @@ import { StyleSheet, Text, View } from "react-native";
 import dayjs from 'dayjs';
 import relativeTime from "dayjs/plugin/relativeTime";
 import { ScrollView } from "react-native-gesture-handler";
+import Message from "../components/Message";
 dayjs.extend(relativeTime);
 
-const Message = ({ message, currentUser, key }) => {
- 
+const MessageList = ({ messages = {}, currentUser }: any) => {
 
-  // if(currentUser?.userId == message?.userId) {
-  //   message.sender = 'u1';
-  // }
-
-  const isMyMessage = () => {
-    return currentUser?.userId == message?.userId; 
-  };
-
-  return (
-    <View style={[
-      styles.container,
-      {
-        backgroundColor: isMyMessage() ? '#badedb' : 'white',
-        alignSelf: isMyMessage() ? 'flex-end' : 'flex-start',
-      }
-    ]}>
-      <Text style={styles.text}>{message?.text}</Text>
-      <Text style={styles.time}>{dayjs(message.timestamp).fromNow(true)}</Text>
-    </View>
-  );
-};
+    const messageArray = Object.values(messages);
+    console.log("Messages: ", messages);
+    return (
+        
+        <ScrollView>
+          {messageArray.map((message: any, index: any) => (
+            <Message message={message} key={index} currentUser={currentUser} />
+          ))}
+          <Text>hello</Text>
+        </ScrollView>
+      );
+}
+      
 
 const styles = StyleSheet.create({
   container: {
@@ -61,4 +53,4 @@ const styles = StyleSheet.create({
   }
 })
 
-export default Message;
+export default MessageList;

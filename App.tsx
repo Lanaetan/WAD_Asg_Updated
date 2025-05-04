@@ -3,6 +3,14 @@ import React from 'react';
 import Navigator from './src/navigation/index';
 import { AuthProvider, useAuth } from './src/contexts/AuthContext'; // if you're using context
 
+const App = () => {
+  return (
+    <AuthProvider>
+      <Root />
+    </AuthProvider>
+  );
+};
+
 const Root = () => {
   const { loading } = useAuth();
 
@@ -18,13 +26,9 @@ const Root = () => {
   return <Navigator />;
 };
 
-const App = () => {
-  return (
-    <AuthProvider>
-      <Root />
-    </AuthProvider>
-  );
-};
+
+
+
 
 export default App;
 
@@ -40,6 +44,8 @@ const styles = StyleSheet.create({
     borderRadius: 50,
   }
 });
+
+
 
 // import React from "react";
 // import {StatusBar, StyleSheet, Text,View} from "react-native";
