@@ -11,19 +11,21 @@ const SignUp = ({route, navigation}: any) => {
   const [isLoading, setIsLoading] = useState(false);
   const {register} = useAuth();
 
-  const emailRef = useRef("");
-  const passwordRef = useRef("");
+  const nameRef = useRef("");
   const usernameRef = useRef("");
-  const profileRef = useRef("");
-
+  const passwordRef = useRef("");
+  const emailRef = useRef("");
+  const imageRef = useRef("");
+  const bioRef = useRef("");
+  
   const handleRegister = async () => {
-    if(!emailRef.current || !passwordRef.current || !usernameRef.current || !profileRef.current) {
+    if(!nameRef.current || !usernameRef.current || !passwordRef.current || !emailRef.current || !imageRef.current) {
       Alert.alert("Sign Up", "Please fill in all fields");
       return;
     }
     setIsLoading(true);
 
-    let response = await register(emailRef.current, passwordRef.current, usernameRef.current, profileRef.current);
+    let response = await register(nameRef.current, usernameRef.current, passwordRef.current, emailRef.current, imageRef.current, bioRef.current);
     setIsLoading(false);
     
     console.log(response);
@@ -37,57 +39,63 @@ const SignUp = ({route, navigation}: any) => {
     
     <View>
       <Text>Sign Up</Text>
-      <TextInput 
-        placeholder="Email" 
-        onChangeText={(value) => emailRef.current = value}
-      />
-      <TextInput 
-        placeholder="Password" 
-        onChangeText={(value) => passwordRef.current = value}
-        placeholderTextColor={'gray'}
-        secureTextEntry={true}
-      />
 
-{/* <Feather name="user" size={24} color="black" /> */}
-<TextInput 
-        placeholder="Username" 
-        onChangeText={(value) => usernameRef.current = value}
-        placeholderTextColor={'gray'}
-      />
-
-<TextInput 
-        placeholder="Profile" 
-        onChangeText={(value) => profileRef.current = value}
-        placeholderTextColor={'gray'}
-      />
-
-      {/* submit button */}
-    <View>
-      {
-        isLoading? (
-          <View>
-            {/* <Loading /> */}
-            <Text>Loading...</Text>
-
-          </View>
-        ) : (
-          
-          <TouchableOpacity onPress={handleRegister}>
-        <Text>Sign Up</Text>
-      </TouchableOpacity>
-        )
-      }
-    </View>
-
+      <View>
+        <TextInput 
+          placeholder="Name" 
+          onChangeText={(value) => nameRef.current = value}
+          placeholderTextColor={'gray'}
+        />
+        {/* <Feather name="user" size={24} color="black" /> */}
+        <TextInput 
+          placeholder="Username" 
+          onChangeText={(value) => usernameRef.current = value}
+          placeholderTextColor={'gray'}
+        />
+        <TextInput 
+          placeholder="Password" 
+          onChangeText={(value) => passwordRef.current = value}
+          placeholderTextColor={'gray'}
+          secureTextEntry={true}
+        />
+        <TextInput 
+          placeholder="Email" 
+          onChangeText={(value) => emailRef.current = value}
+          placeholderTextColor={'gray'}
+        />
+        <TextInput 
+          placeholder="Image" 
+          onChangeText={(value) => imageRef.current = value}
+          placeholderTextColor={'gray'}
+        />
+        <TextInput 
+          placeholder="Bio" 
+          onChangeText={(value) => bioRef.current = value}
+          placeholderTextColor={'gray'}
+        />
+      </View>
       
+      {/* submit button */}
+      <View>
+        {
+          isLoading? (
+            <View>
+              {/* <Loading /> */}
+              <Text>Loading...</Text>
+            </View>
+          ) : (
+            <TouchableOpacity onPress={handleRegister}>
+            <Text>Sign Up</Text>
+            </TouchableOpacity>
+          )
+        }
+      </View>
 
       {/* sign up test */}
       <Text>Already have an account?</Text>
       <Pressable onPress={() => navigation.navigate('SignIn')}>
         <Text>Sign In</Text>
       </Pressable>
-     
-      
     </View>
   );
 }

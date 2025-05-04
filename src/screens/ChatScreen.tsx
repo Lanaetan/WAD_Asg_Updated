@@ -12,16 +12,30 @@ import { getRoomId } from "../utils/Common";
 import { addDoc, collection, doc, onSnapshot, orderBy, query, setDoc, Timestamp } from "firebase/firestore";
 import { db } from "../../firebaseConfig";
 import MessageList from "./MessageList";
+import { getDBConnection } from "../db-service/userService";
+import { createMessage, getMessagesBetween } from "../db-service/messageService";
 
 
 const ChatScreen = ({route, navigation}: any) => {
+
+  const { id, username, image } = route.params; // got
+  const { user } = useAuth(); // got
+  const [ messages, setMessages ] = useState<any>([])
+  const [ message, setMessage ] = useState<any>();
+
+  // useEffect(() => {
+  //   navigation.setOptions({ 
+  //     title: username
+  //   });
+  //   console.log('id, username, image in chat screen : ', id, username, image);
+  // }, [username]);
 
   // FIREBASE ==========
   // const { id, username, image } = route.params;
   // const { user } = useAuth();
   // const [messages, setMessages] = useState<any[]>([]);
-  // const textRef = useRef<string>('');
-  // const inputRef = useRef<any>(null);
+  const textRef = useRef<string>('');
+  const inputRef = useRef<any>(null);
 
   // useEffect(() => {
   //   createRoomIfNotExists();
@@ -50,14 +64,6 @@ const ChatScreen = ({route, navigation}: any) => {
   //     createdAt: Timestamp.fromDate(new Date()),
   //   });
   // }
-  
-  
-
-  useEffect(() => {
-    navigation.setOptions({ 
-      title: route.params.name 
-    });
-  }, [route.params?.name]);
 
   // if using emulator, paste this: http://10.0.2.2:5000/chat
   var socket = io('http://192.168.0.14:5000/chat', {
@@ -94,17 +100,34 @@ const ChatScreen = ({route, navigation}: any) => {
   //   });
   // },[]);
 
-  const { id, username, image } = route.params;
+  const _query = async () => {
+    try {
+        setMessages(await getMessagesBetween(await getDBConnection(), user?.id, id));
+      }catch (error) {
+        console.error(error);
+          throw Error('Failed to get chat data !!!');
+      }
+  }
 
   useEffect(() => {
-      navigation.setOptions({ 
-        headerTitle: () => (
-          <View style={styles.container}>
-            <Image style={styles.image} source={{ uri: image }}/>
-            <Text style={styles.name}>{ username }</Text>
-          </View>
-        )
-      });
+    // const fetchMessages = async () => {
+    //   const data = await _query();
+    //   setMessages(data);
+    //   console.log("Messages retrieved: ", data);
+    // };
+  
+    navigation.setOptions({
+      headerTitle: () => (
+        <View style={styles.container}>
+          <Image style={styles.image} source={{ uri: image }} />
+          <Text style={styles.name}>{username}</Text>
+        </View>
+      ),
+    });
+  
+    if(id){
+      _query();
+    }
     }, [username]);
 
     // const handleSendMessage = async () => {
@@ -131,8 +154,46 @@ const ChatScreen = ({route, navigation}: any) => {
     //   }
     // }
 
+    // const _createMessage = async () => {
+    //   try {
+    //     const db = await getDBConnection();
+    //     const query = `SELECT * FROM messages WHERE receiver_id = ? AND sender_id = ? OR receiver_id = ? AND sender_id = ? ORDER BY created_at ASC`;
+    //     const query1 = 'INSERT INTO messages(receiver_id,sender_id,text,created_at) VALUES(?,?,?,?,?,?)';
+    //     const parameters = [id, user?.id,textRef.current, now];
+    //   }catch (error) {
+    //     console.error(error);
+    //       throw Error('Failed to create new message !!!');
+    //   }
+    // }
+
+    // const _createMessage = async () => {
+    //     try {
+    //       const result = await createMessage(await getDBConnection(), id, user?.id, textRef.current);
+    //       setMessage(result)
+    //     }catch (error) {
+    //       console.error(error);
+    //       throw Error('Failed to create message !!!');
+    //     }
+    //   }
+
+    const handleSendMessage = async () => {
+      let message = textRef.current.trim();
+      if (!message) return; // Prevent sending empty messages
+
+      try {
+        await createMessage(await getDBConnection(), id, user?.id, textRef.current);
+        await _query(); // reload all messages from db
+        textRef.current = ''; // clear input
+        inputRef.current?.clear(); // clear UI
+        console.log('messages after reload: ', messages);
+      } catch (error) {
+        console.error(error);
+        Alert.alert("Error", "Failed to send message");
+      }
+    }
+
     return(
-      <View style={styles.bg}>cd 
+      <View style={styles.bg}>
          <View style={styles.messagesContainer}>
           <MessageList messages={messages} currentUser={user} />     
          </View>

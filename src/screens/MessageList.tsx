@@ -1,27 +1,54 @@
-import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import React, { useEffect } from "react";
+import { StyleSheet, Text, View, FlatList, ScrollView } from "react-native";
 import dayjs from 'dayjs';
 import relativeTime from "dayjs/plugin/relativeTime";
-import { ScrollView } from "react-native-gesture-handler";
 import Message from "../components/Message";
+import { useAuth } from "../contexts/AuthContext";
 dayjs.extend(relativeTime);
 
-const MessageList = ({ messages = {}, currentUser }: any) => {
+// Define the type for a message
+type MessageType = {
+  id: number;
+  sender_id: number;
+  receiver_id: number;
+  text: string;
+  created_at: string;
+};
 
-    const messageArray = Object.values(messages);
-    console.log("Messages: ", messages);
-    return (
-        
-        <ScrollView>
-          {messageArray.map((message: any, index: any) => (
-            <Message message={message} key={index} currentUser={currentUser} />
-          ))}
-          
-        </ScrollView>
-      );
+// Define the type for the props of MessageList
+type MessageListProps = {
+  messages: MessageType[];   
+  currentUser: any;         
+};
+
+const MessageList: React.FC<MessageListProps> = ({ messages, currentUser }) => {
+
+  useEffect(()=>{
+    console.log('messagelist', messages);
+  },[messages])
+
+  return (
+    <View>
+      <FlatList 
+        data={messages}
+        renderItem={({ item }: any) => {
+          console.log('Render item:', item); // Check the structure
+          return (
+            <Message 
+              receiverId={item.receiver_id} 
+              senderId={item.sender_id} 
+              text={item.text} 
+              createdAt={item.created_at} 
+              currentUser={currentUser}
+            />
+          );
+        }}
+        keyExtractor={(item, index) => index.toString()}
+      />
+    </View>
+  );
 }
       
-
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'white',

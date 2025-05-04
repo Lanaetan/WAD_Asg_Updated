@@ -15,8 +15,6 @@ import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Feather from "react-native-vector-icons/Feather";
 
-import HomeScreen from "../screens/HomeScreen";
-import ProfileScreen from "../screens/ProfileScreen";
 import ChatsScreen from "../screens/ChatsScreen";
 import NotificationScreen from "../screens/NotificationScreen";
 import BottomTabNavigator from "./BottomTabNavigator";
@@ -44,7 +42,7 @@ const MyDrawerComponent = (props) => {
         <ImageBackground
           source={{
             uri:
-              user?.profileUrl ||
+              user?.image ||
               "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg",
           }}
           style={{ padding: 10 }}
@@ -59,7 +57,7 @@ const MyDrawerComponent = (props) => {
             }}
             source={{
               uri:
-                user?.profileUrl ||
+                user?.image ||
                 "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg",
             }}
           />
@@ -165,9 +163,9 @@ const DrawerNavigator = () => {
   //   }
   // };
 
-  const getUsersExceptCurrent = async () => {
+  const _query = async () => {
     try {
-      setUsers(await getUsersExceptCurrent(await getDBConnection(), '1'));
+      setUsers(await getUsersExceptCurrent(await getDBConnection(), user?.id));
     }catch (error) {
       console.error(error);
         throw Error('Failed to get users except current logged in user !!!');
@@ -175,11 +173,8 @@ const DrawerNavigator = () => {
   }
 
   useEffect(() => {
-    // if (user?.uid) {
-    //   getUsers();
-    // }
-    if (user?.uid) {
-      getUsersExceptCurrent();
+    if (user?.id) {
+      _query();
     }
   }, [user]);
 

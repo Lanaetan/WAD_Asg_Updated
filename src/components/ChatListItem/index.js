@@ -6,31 +6,32 @@ import relativeTime from "dayjs/plugin/relativeTime";
 
 dayjs.extend(relativeTime);
 
-const ChatListItem = ({ chat, index, noBorder }) => {
+const ChatListItem = ({ chat }) => {
   const navigation = useNavigation();
-  const image = chat?.profileUrl || 'https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg';
-  const name = chat?.username || 'Username';
+  const id = chat?.id
+  const image = chat?.image || 'https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg';
+  const username = chat?.username || 'Username';
 
 
   const openChatRoom = () => {
-    // console.log('ChatListItem', chat);
+    console.log('ChatListItem', chat);
     navigation.navigate('Chat', { 
-      id: chat.userId, 
-      username: chat.username, 
-      image: chat.profileUrl 
+      id: id, 
+      username: username, 
+      image: image,
     });
   }
 
   return (
 
-    <Pressable onPress={() => openChatRoom()} 
+    <Pressable onPress={openChatRoom} 
       style={styles.container}>
       <Image source={{ uri: image }} style={styles.image} />
       <View style={styles.content}>
         <View style={styles.row}>
           <Text numberOfLines={1} 
             style={styles.name}>
-              {name}</Text>
+              {username}</Text>
           {/* <Text style={styles.subTitle}>{dayjs(chat.lastMessage.createdAt).fromNow()}</Text> */}
         </View>
 

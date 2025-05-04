@@ -3,6 +3,7 @@ import React, { createContext, useEffect, useState, useContext } from 'react';
 import { doc, addDoc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../../firebaseConfig'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getDBConnection } from '../db-service/userService';
 
 
 
@@ -15,6 +16,7 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const loadUser = async () => {
+      setLoading(true);
       try {
         const storedUser = await AsyncStorage.getItem('user');
         if (storedUser) {
@@ -157,8 +159,18 @@ export const AuthProvider = ({ children }) => {
   //   }
   // };
 
-  const register = async (email, password, username, profileUrl) => {
+  const register = async (name, username, password, email, image, bio) => {
     try {
+      if (!email || !password || !username) {
+        return { success: false, message: 'All fields are required.' };
+      }
+      if (!email.includes('@')) {
+        return { success: false, message: 'Invalid email format.' };
+      }
+      if (password.length < 6) {
+        return { success: false, message: 'Password should be at least 6 characters.' };
+      }
+
       const db = await getDBConnection();
 
       // Check if email already exists
@@ -170,8 +182,28 @@ export const AuthProvider = ({ children }) => {
       }
 
       // Insert new user
-      const insertQuery = `INSERT INTO users (email, password, username, profileUrl) VALUES (?, ?, ?, ?)`;
-      await db.executeSql(insertQuery, [email, password, username, profileUrl]);
+      const insertQuery = `INSERT INTO users (name, username, password, email, image, bio) VALUES (?, ?, ?, ?, ?, ?)`;
+      await db.executeSql(insertQuery, [name, username, password, email, image, bio]);
+
+      // Get the new user (assuming SQLite auto-increments ID)
+      const newUserQuery = `SELECT * FROM users WHERE email = ? LIMIT 1`;
+      const newUserResults = await db.executeSql(newUserQuery, [email]);
+      const newUser = newUserResults[0].rows.item(0);
+
+      const currentUser = {
+        id: newUser.id,
+        name: newUser.name,
+        username: newUser.username,
+        password: newUser.password,
+        email: newUser.email,
+        image: newUser.image,
+        bio: newUser.bio || '',
+      };
+
+      setUser(currentUser);
+      setIsAuthenticated(true);
+      await AsyncStorage.setItem('user', JSON.stringify(currentUser));
+      console.log('current user: ', currentUser);
 
       return { success: true };
     } catch (error) {

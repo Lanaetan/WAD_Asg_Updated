@@ -1,8 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import { View, Text, Button, FlatList, StyleSheet } from 'react-native';
-import { AuthContext } from '../contexts/AuthContext';
-import { getDBConnection, getUserById, getUsers, getUsersExceptCurrent } from '../db-service/userService';
-// let common = require('../CommonData');
+import { getDBConnection, getUsersExceptCurrent } from '../db-service/userService';
 let SQLite = require('react-native-sqlite-storage');
 
 const openCallback = () => {
@@ -15,61 +13,39 @@ console.log('Error in opening the database: ' + err);
 
 const TestDbScreen = ({ navigation }: any) => {
   
-    const [students, setStudents] = useState<any>([]);
-    const [users, setUsers] = useState<any>([]);
-
-    // let db = SQLite.openDatabase(
-    //     {name: 'db.sqlite', createFromLocation: '~db.sqlite'},
-    //     openCallback,
-    //     errorCallback,
-    // )
+  const [users, setUsers] = useState<any>([]);
 
   const _query = async () => {
-    // try{
-    //     const studentData:any = [];
-    //     db.executeSql('SELECT * FROM users ORDER BY name',[], (results:any) => {
-    //       (results.rows.raw()).forEach(( item:any ) => {
-    //         studentData.push(item);
-    //       })
-    //       setStudents(studentData);
-    //     });
-    //   } catch (error) {
-    //     console.error(error);
-    //     throw Error('Failed to get students !!!');
-    //   }
-
-      try{
-        setUsers(await getUsersExceptCurrent(await getDBConnection(), '1'));
-      }catch (error) {
-        console.error(error);
-        throw Error('Failed to get users except current logged in user !!!');
-      }
-      console.log("users in sqlite: ", users);
+    try{
+      setUsers(await getUsersExceptCurrent(await getDBConnection(), '1'));
+    }catch (error) {
+      console.error(error);
+      throw Error('Failed to get users except current logged in user !!!');
+    }
+    console.log("users in sqlite: ", users);
   }
 
   useEffect(()=>{
     _query();
   },[]);
 
-
   return (
     <View>
-        <FlatList
-          data={users}
-          showsVerticalScrollIndicator={true}
-          renderItem={({item}:any) => (
-              <View style={styles.item}>
-                <Text style={styles.itemTitle}>{item.name}</Text>
-                <Text style={styles.itemSubtitle}>
-                 {item.email}
-                </Text>
-              </View>
-            
-          )}
-          keyExtractor={ (item:any) => 
-            item.id.toString()
-          }
-        />
+      <FlatList
+        data={users}
+        showsVerticalScrollIndicator={true}
+        keyExtractor={ (item:any) => 
+          item.id.toString()
+        }
+        renderItem={({item}:any) => (
+            <View style={styles.item}>
+              <Text style={styles.itemTitle}>{item.name}</Text>
+              <Text style={styles.itemSubtitle}>
+                {item.email}
+              </Text>
+            </View>
+        )}
+      />
     </View>
   );
 };

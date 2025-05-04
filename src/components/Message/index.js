@@ -1,31 +1,38 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import dayjs from 'dayjs';
 import relativeTime from "dayjs/plugin/relativeTime";
 import { ScrollView } from "react-native-gesture-handler";
+import { useAuth } from "../../contexts/AuthContext";
 dayjs.extend(relativeTime);
 
-const Message = ({ message, currentUser, key }) => {
- 
+const Message = ({ receiverId, senderId, text, createdAt, currentUser }) => {
 
-  // if(currentUser?.userId == message?.userId) {
-  //   message.sender = 'u1';
-  // }
+  useEffect(() => {
+    // console.log("Message Props -> senderId:", senderId);
+    // console.log("Message Props -> receiverId:", receiverId);
+    // console.log("Current User ID:", currentUser?.id);
+  }, []);
+
+  if (!currentUser || senderId === undefined) return null;
 
   const isMyMessage = () => {
-    return currentUser?.userId == message?.userId; 
+    return currentUser.id === senderId;
   };
-
+  
   return (
     <View style={[
       styles.container,
       {
         backgroundColor: isMyMessage() ? '#badedb' : 'white',
         alignSelf: isMyMessage() ? 'flex-end' : 'flex-start',
+        marginRight: isMyMessage() ? 12 : 0,
+        marginLeft: isMyMessage() ? 0 : 12,
       }
     ]}>
-      <Text style={styles.text}>{message?.text}</Text>
-      <Text style={styles.time}>{dayjs(message.timestamp).fromNow(true)}</Text>
+      <Text style={styles.text}>{text}</Text>
+      <Text style={[styles.time, {
+      }]}>{dayjs(createdAt).fromNow(true)}</Text>
     </View>
   );
 };
@@ -39,7 +46,7 @@ const styles = StyleSheet.create({
     paddingVertical: 7,
     borderRadius: 10,
     maxWidth: '80%',
-
+    minWidth: '25%',
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -47,8 +54,8 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
-
     elevation: 5,
+
   },
   text: {
     color: 'black',
@@ -57,7 +64,7 @@ const styles = StyleSheet.create({
     color: 'gray',
     alignSelf: 'flex-end',
     fontSize: 10,
-    marginTop: 5,
+    // marginTop: 5,
   }
 })
 

@@ -29,14 +29,13 @@ const SignIn = ({route, navigation}: any) => {
     setIsLoading(true);
     const success = await login(emailRef.current, passwordRef.current);
     setIsLoading(false);
-    console.log("Sign in response: " + success);
+    console.log("Sign in response: " + JSON.stringify(success));
     if (!success) {
       Alert.alert("Sign In", "Invalid email or password");
     }
   }
 
   return (
-
     <View>
       <Text>Sign In</Text>
       <TextInput 
@@ -59,18 +58,18 @@ const SignIn = ({route, navigation}: any) => {
               <Text>Loading...</Text>
             </View>
           ) : (
-            
             <TouchableOpacity onPress={handleLogin}>
               <Text>Sign In</Text>
             </TouchableOpacity>
           )
         }
       </View>
-        {/* sign up test */}
+      <View>
         <Text>Don't have an account?</Text>
-        <Pressable onPress={() => navigation.navigate('SignUp')}>
+          <Pressable onPress={() => navigation.navigate('SignUp')}>
           <Text>Sign Up</Text>
         </Pressable>
+      </View>
     </View>
   );
 }

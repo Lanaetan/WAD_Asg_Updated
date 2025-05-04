@@ -80,8 +80,6 @@ export const getUserByEmail = async( db: SQLiteDatabase, email: string ): Promis
 }
 
 
-
-
 export const createUser = async( 
         db: SQLiteDatabase,
         name: string,
