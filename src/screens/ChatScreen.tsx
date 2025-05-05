@@ -14,14 +14,15 @@ import { db } from "../../firebaseConfig";
 import MessageList from "./MessageList";
 import { getDBConnection } from "../db-service/userService";
 import { createMessage, getMessagesBetween } from "../db-service/messageService";
+import LottieView from 'lottie-react-native';
 
 
 const ChatScreen = ({route, navigation}: any) => {
 
-  const { id, username, image } = route.params; // got
+  const { id, username, image, refresh } = route.params; // got
   const { user } = useAuth(); // got
   const [ messages, setMessages ] = useState<any>([])
-  const [ message, setMessage ] = useState<any>();
+  const [loading, setLoading] = useState(true);
 
   // useEffect(() => {
   //   navigation.setOptions({ 
@@ -110,12 +111,6 @@ const ChatScreen = ({route, navigation}: any) => {
   }
 
   useEffect(() => {
-    // const fetchMessages = async () => {
-    //   const data = await _query();
-    //   setMessages(data);
-    //   console.log("Messages retrieved: ", data);
-    // };
-  
     navigation.setOptions({
       headerTitle: () => (
         <View style={styles.container}>
@@ -124,11 +119,16 @@ const ChatScreen = ({route, navigation}: any) => {
         </View>
       ),
     });
+
+    const loadMessages = async () => {
+      await _query();
+      setTimeout(() => setLoading(false), 1000); // Show loading for at least 3 seconds
+    };
   
-    if(id){
-      _query();
+    if (id) {
+      loadMessages();
     }
-    }, [username]);
+  }, [username]);
 
     // const handleSendMessage = async () => {
     //   let message = textRef.current.trim();
@@ -185,11 +185,24 @@ const ChatScreen = ({route, navigation}: any) => {
         await _query(); // reload all messages from db
         textRef.current = ''; // clear input
         inputRef.current?.clear(); // clear UI
-        console.log('messages after reload: ', messages);
+        refresh();
       } catch (error) {
         console.error(error);
         Alert.alert("Error", "Failed to send message");
       }
+    }
+
+    if (loading) {
+      return (
+        <View style={[styles.bg, { justifyContent: 'center', alignItems: 'center', flex: 1 }]}>
+          <LottieView
+            source={require('../assets/animations/loading.json')}
+            autoPlay
+            loop
+            style={{ width: 100, height: 100, marginBottom: 70 }}
+          />
+        </View>
+      );
     }
 
     return(
@@ -245,15 +258,13 @@ inputContainer: {
     borderRadius: 30,
     overflow: 'hidden',
   },
-
-
   bg: {
     flex: 1,
     backgroundColor: '#e3e6e5',
   },
   messagesContainer: {
     flex: 1,
-    paddingBottom: 10, // space above the input box
+    paddingBottom: 10,
   },
   container: {
     flexDirection: 'row',

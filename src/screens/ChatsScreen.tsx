@@ -1,33 +1,23 @@
 import React from "react";
 import {View, FlatList} from "react-native";
 import ChatListItem from "../components/ChatListItem";
+import { useAuth } from "../contexts/AuthContext";
 
 
-const ChatsScreen = ({users}: any) => { // this users is passed from firebase, to be deleted later
+const ChatsScreen = ({users, refresh}: any) => {
+  const { user } = useAuth();
   
     return(
       <View>
         <FlatList 
           data={users}
-          renderItem={({ item, index }) => 
-            <ChatListItem noBorder={index+1 == users.length} chat={item} index={index}/>
+          renderItem={({ item }) => 
+            <ChatListItem chat={item} currentUser={user} refresh={refresh} />
           }
           keyExtractor={(item) => item.id.toString()}
           showsVerticalScrollIndicator={false}
         />
       </View>
-
-      // <View>
-      //   {/* <StatusBar style="light" /> */}
-      //   <FlatList 
-      //     data={users}
-      //     renderItem={({ item, index }) => 
-      //       <ChatListItem noBorder={index+1 == users.length} chat={item} index={index}/>
-      //     }
-      //     // keyExtractor={(item) => item.uid.toString()}
-      //     showsVerticalScrollIndicator={false}
-      //   />
-      // </View>
     )
 }
 

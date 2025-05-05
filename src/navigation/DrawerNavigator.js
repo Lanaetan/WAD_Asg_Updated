@@ -247,7 +247,7 @@ const DrawerNavigator = () => {
           ),
         }}
       >
-        {(props) => <ChatsScreen {...props} users={users} />}
+        {(props) => <ChatsScreen {...props} users={users} refresh={_query} />}
       </Drawer.Screen>
     </Drawer.Navigator>
   );

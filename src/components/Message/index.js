@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import dayjs from 'dayjs';
 import relativeTime from "dayjs/plugin/relativeTime";
-import { ScrollView } from "react-native-gesture-handler";
-import { useAuth } from "../../contexts/AuthContext";
+
 dayjs.extend(relativeTime);
 
 const Message = ({ receiverId, senderId, text, createdAt, currentUser }) => {

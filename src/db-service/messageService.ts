@@ -72,6 +72,36 @@ try{
   }
 }
 
+export const getLastMessage = async (
+  db: SQLiteDatabase,
+  currentUserId: string,
+  otherUserId: string
+): Promise<any> => {
+  try {
+    const query = `
+      SELECT * FROM messages
+      WHERE 
+        (receiver_id = ? AND sender_id = ?) 
+        OR 
+        (receiver_id = ? AND sender_id = ?)
+      ORDER BY created_at DESC
+      LIMIT 1
+    `;
+    const parameters = [currentUserId, otherUserId, otherUserId, currentUserId];
+    const results = await db.executeSql(query, parameters);
+
+    if (results.length > 0 && results[0].rows.length > 0) {
+      return results[0].rows.item(0); // return the last (most recent) message
+    }
+
+    return null; // no messages found
+  } catch (error) {
+    console.error(error);
+    throw Error('Failed to get last message!');
+  }
+};
+
+
 const openCallback = () => {
     console.log('database open success');
 }
