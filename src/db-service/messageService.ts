@@ -5,12 +5,20 @@ const databaseName = 'db.sqlite';
 // Enable promise for SQLite
 enablePromise(true);
 
+let dbInstance: SQLiteDatabase | null = null;
+
 export const getDBConnection = async() => {
-    return openDatabase(
-        {name: `${databaseName}`, createFromLocation: '~db.sqlite'},
-        openCallback,
-        errorCallback,
-    );
+  if (dbInstance) {
+    return dbInstance;
+  }
+
+  dbInstance = await openDatabase(
+    { name: databaseName, createFromLocation: '~db.sqlite' },
+    openCallback,
+    errorCallback
+  );
+
+  return dbInstance;
 }
 
 export const getUsersExceptCurrent = async (

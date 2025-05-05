@@ -67,39 +67,39 @@ const ChatScreen = ({route, navigation}: any) => {
   // }
 
   // if using emulator, paste this: http://10.0.2.2:5000/chat
-  var socket = io('http://192.168.0.14:5000/chat', {
+  var socket = io('http://192.168.0.14:5050/chat', {
     transports: ['websocket'],
   });
 
-  // useEffect(()=>{
+  useEffect(()=>{
 
-  //   socket.on('connect', () => {
+    socket.on('connect', () => {
 
-  //     console.log(socket.id); // undefined
-  //     socket.emit('mobile_client_connected', {connected: true}, (response: any)=>{
-  //       console.log(response)
-  //     });
-  //     ToastAndroid.show('Connected to server', ToastAndroid.LONG);
-  //   });
+      console.log(socket.id); // undefined
+      socket.emit('mobile_client_connected', {connected: true}, (response: any)=>{
+        console.log(response)
+      });
+      ToastAndroid.show('Connected to server', ToastAndroid.LONG);
+    });
 
-  //   socket.on('connect_to_client', (data: any) => {
-  //     let greets=JSON.parse(data)
-  //     console.log(greets)
-  //   });
+    socket.on('connect_to_client', (data: any) => {
+      let greets=JSON.parse(data)
+      console.log(greets)
+    });
 
-  //   // Handle connection error
-  //   socket.on('error', (error: any) => {
-  //       ToastAndroid.show('Failed to connect to server', ToastAndroid.LONG);
-  //   });
+    // Handle connection error
+    socket.on('error', (error: any) => {
+        ToastAndroid.show('Failed to connect to server', ToastAndroid.LONG);
+    });
 
-  //   // Receive chat broadcast from server.
-  //   socket.on('message_broadcast', (data:any) => {
-  //     console.log(data);
-  //     let messageBag = JSON.parse(data);
+    // Receive chat broadcast from server.
+    socket.on('message_broadcast', (data:any) => {
+      console.log(data);
+      let messageBag = JSON.parse(data);
 
-  //     setChatroom(chatroom => [...chatroom, messageBag]);
-  //   });
-  // },[]);
+      setChatroom(chatroom => [...chatroom, messageBag]);
+    });
+  },[]);
 
   const _query = async () => {
     try {

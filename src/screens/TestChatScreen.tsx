@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import io from 'socket.io-client';
 
-var socket = io('http://192.168.0.14:5000/chat', {
+var socket = io('http://192.168.0.14:5050/chat', {
     transports: ['websocket'],
 });
 
@@ -22,8 +22,6 @@ const App = () => {
   const [chatroom, setChatroom] = useState('');
 
   useEffect(()=>{
-    // When connected, emit a message to the server to inform that this client has connected to the server.
-    // Display a Toast to inform user that connection was made.
     socket.on('connect', () => {
 
       console.log(socket.id); // undefined
