@@ -17,25 +17,22 @@ const CreateScreen = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [errors, setErrors] = useState({});
+  const [isPosting, setIsPosting] = useState(false);
   
+  // Function to pick image from gallery
+  // This function is called when the user taps on the image area to select a photo
   const pickImage = () => {
     ImagePicker.launchImageLibrary(
       {
         mediaType: 'photo',
         quality: 1,
       },
-      async (response) => {
+      (response) => {
         if (response.didCancel) return;
   
         if (response.assets && response.assets[0]?.uri) {
           const localUri = response.assets[0].uri;
           setSelectedImage(localUri);
-          
-          // Upload to Cloudinary
-          const cloudUrl = await uploadImageToCloudinary(localUri);
-          if (cloudUrl) {
-            setUploadedImageUrl(cloudUrl);
-          }
         }
       },
     );
@@ -57,8 +54,12 @@ const CreateScreen = () => {
         body: data,
       });
       const json = await res.json();
-      console.log('Cloudinary URL:', json.secure_url);
-      return json.secure_url;
+      console.log('Cloudinary Upload Response:', json);
+      
+      // Transform URL to get centered crop
+      const transformedUrl = json.secure_url.replace('/upload/', '/upload/c_fill,g_auto,w_800,h_300,q_auto/');
+      
+      return transformedUrl;
     } catch (err) {
       console.error('Cloudinary Upload Error:', err);
       return null;
@@ -92,26 +93,45 @@ const CreateScreen = () => {
       return;
     }
     
-    // If validation passes, continue with post creation
-    if (selectedImage) {
-      await uploadImageToCloudinary(selectedImage);
+    try {
+      setIsPosting(true);
+      let imageUrl = null;
+      
+      // Upload to Cloudinary only when creating the post
+      if (selectedImage) {
+        imageUrl = await uploadImageToCloudinary(selectedImage);
+      }
+      
+      // Save post to database or API (to be implemented)
+      // For now, just log the data to console
+      console.log('Creating post with:', { title, content, imageUrl });
+      
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Show success message
+      Alert.alert(
+        "Success",
+        "Your post has been created successfully!",
+        [{ text: "OK" }]
+      );
+      
+      // Reset form
+      setTitle('');
+      setContent('');
+      setSelectedImage(null);
+      setUploadedImageUrl(null);
+      
+    } catch (error) {
+      console.error('Error creating post:', error);
+      Alert.alert(
+        "Error",
+        "Failed to create post. Please try again.",
+        [{ text: "OK" }]
+      );
+    } finally {
+      setIsPosting(false);
     }
-    
-    // Here you would save the post to your database
-    console.log('Creating post with:', { title, content, imageUrl: uploadedImageUrl });
-    
-    // Show success message
-    Alert.alert(
-      "Success",
-      "Your post has been created successfully!",
-      [{ text: "OK" }]
-    );
-    
-    // Reset form
-    setTitle('');
-    setContent('');
-    setSelectedImage(null);
-    setUploadedImageUrl(null);
   };
 
   return (
@@ -121,6 +141,7 @@ const CreateScreen = () => {
           What's on your mind?
         </Text>
         
+        {/* Input for Title */}
         <TextInput 
           placeholder="Title" 
           style={[styles.input, errors.title ? styles.inputError : null]} 
@@ -134,6 +155,7 @@ const CreateScreen = () => {
         />
         {errors.title && <Text style={styles.errorText}>{errors.title}</Text>}
         
+        {/* Input for Content */}
         <TextInput
           placeholder="Content"
           multiline
@@ -149,13 +171,13 @@ const CreateScreen = () => {
         />
         {errors.content && <Text style={styles.errorText}>{errors.content}</Text>}
         
-        <TouchableOpacity onPress={pickImage} style={styles.imageWrapper}>
+        {/* Image Picker (only one picture) */}
+        <TouchableOpacity onPress={pickImage} style={styles.imageWrapper} disabled={isPosting}>
           <View style={{position: 'relative'}}>
             <Image
               style={styles.image}
               source={{
                 uri:
-                  uploadedImageUrl ||
                   selectedImage ||
                   'https://via.placeholder.com/150?text=Tap+to+choose+photo',
               }}
@@ -168,8 +190,15 @@ const CreateScreen = () => {
           </View>
         </TouchableOpacity>
         
-        <TouchableOpacity onPress={createPost} style={styles.postButton}>
-          <Text style={styles.postButtonText}>Post Now!</Text>
+        {/* Post Button */}
+        <TouchableOpacity 
+          onPress={createPost} 
+          style={[styles.postButton, isPosting ? styles.postButtonDisabled : null]} 
+          disabled={isPosting}
+        >
+          <Text style={styles.postButtonText}>
+            {isPosting ? 'Creating Post...' : 'Post Now!'}
+          </Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -201,7 +230,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: 200,
+    height: 300,
     borderRadius: 5,
   },
   overlayText: {
@@ -216,6 +245,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#102E50',
     padding: 15,
     borderRadius: 5,
+  },
+  postButtonDisabled: {
+    backgroundColor: '#7a93a9',
   },
   postButtonText: {
     color: '#fff',
