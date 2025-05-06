@@ -1,28 +1,56 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Text, View, ImageBackground, StyleSheet, FlatList, TextInput, Image, ToastAndroid, Alert, SafeAreaView, TouchableOpacity } from "react-native";
-import { useRoute, useNavigation } from "@react-navigation/native";
-import io from 'socket.io-client';
+import { Text, View, StyleSheet, TextInput, Image, Alert, SafeAreaView, TouchableOpacity, LogBox } from "react-native";
 import Feather from "react-native-vector-icons/Feather";
-import Message from "../components/Message";
-import InputBox from "../components/InputBox";
-
-import messages from '../data/messages.json'
-import { useAuth } from "../contexts/AuthContext";
-import { getRoomId } from "../utils/Common";
-import { addDoc, collection, doc, onSnapshot, orderBy, query, setDoc, Timestamp } from "firebase/firestore";
-import { db } from "../../firebaseConfig";
-import MessageList from "./MessageList";
-import { getDBConnection } from "../db-service/userService";
-import { createMessage, getMessagesBetween } from "../db-service/messageService";
 import LottieView from 'lottie-react-native';
+
+import { useAuth } from "../contexts/AuthContext";
+import { useSocket } from "../contexts/SocketContext";
+import socket from "../utils/socket";
+
+import MessageList from "./MessageList";
+
+import { getDBConnection } from "../db-service/database";
+import { createMessage, getMessagesBetween } from "../db-service/messageService";
+
+LogBox.ignoreLogs([
+  'Non-serializable values were found in the navigation state',
+]);
 
 
 const ChatScreen = ({route, navigation}: any) => {
 
   const { id, username, image, refresh } = route.params; // got
-  const { user } = useAuth(); // got
-  const [ messages, setMessages ] = useState<any>([])
-  const [loading, setLoading] = useState(true);
+  const { user } = useAuth(); 
+
+  const [ messages, setMessages ] = useState<any>([]);
+   const [loading, setLoading] = useState(true);
+
+  const textRef = useRef<string>('');
+  const inputRef = useRef<any>(null);
+
+  // Socket setup
+  // if using emulator, change to http://10.0.2.2:5000/chat
+  // var socket = io('http://192.168.0.14:5050/chat', {
+  //   transports: ['websocket'],
+  // });
+
+  // Initial socket connection and listeners
+  // useEffect(() => {
+  //   if (!socket) return;    
+
+  //   socket.on('message_broadcast', (data: any) => {
+  //     const messageBag = JSON.parse(data);
+  //     setMessages((prev:any) => [...prev, messageBag]);
+  //     console.log('what is inside messageBag? ', messageBag);
+  //     console.log('message from html: ', messages);
+  //   });
+
+  //   // return () => {
+  //   //   socket.off('message_broadcast', onMessage);
+  //   // };
+  // }, [socket]);
+
+
 
   // useEffect(() => {
   //   navigation.setOptions({ 
@@ -35,8 +63,7 @@ const ChatScreen = ({route, navigation}: any) => {
   // const { id, username, image } = route.params;
   // const { user } = useAuth();
   // const [messages, setMessages] = useState<any[]>([]);
-  const textRef = useRef<string>('');
-  const inputRef = useRef<any>(null);
+
 
   // useEffect(() => {
   //   createRoomIfNotExists();
@@ -66,70 +93,7 @@ const ChatScreen = ({route, navigation}: any) => {
   //   });
   // }
 
-  // if using emulator, paste this: http://10.0.2.2:5000/chat
-  var socket = io('http://192.168.0.14:5050/chat', {
-    transports: ['websocket'],
-  });
-
-  useEffect(()=>{
-
-    socket.on('connect', () => {
-
-      console.log(socket.id); // undefined
-      socket.emit('mobile_client_connected', {connected: true}, (response: any)=>{
-        console.log(response)
-      });
-      ToastAndroid.show('Connected to server', ToastAndroid.LONG);
-    });
-
-    socket.on('connect_to_client', (data: any) => {
-      let greets=JSON.parse(data)
-      console.log(greets)
-    });
-
-    // Handle connection error
-    socket.on('error', (error: any) => {
-        ToastAndroid.show('Failed to connect to server', ToastAndroid.LONG);
-    });
-
-    // Receive chat broadcast from server.
-    socket.on('message_broadcast', (data:any) => {
-      console.log(data);
-      let messageBag = JSON.parse(data);
-
-      setChatroom(chatroom => [...chatroom, messageBag]);
-    });
-  },[]);
-
-  const _query = async () => {
-    try {
-        setMessages(await getMessagesBetween(await getDBConnection(), user?.id, id));
-      }catch (error) {
-        console.error(error);
-          throw Error('Failed to get chat data !!!');
-      }
-  }
-
-  useEffect(() => {
-    navigation.setOptions({
-      headerTitle: () => (
-        <View style={styles.container}>
-          <Image style={styles.image} source={{ uri: image }} />
-          <Text style={styles.name}>{username}</Text>
-        </View>
-      ),
-    });
-
-    const loadMessages = async () => {
-      await _query();
-      setTimeout(() => setLoading(false), 1000); // Show loading for at least 3 seconds
-    };
   
-    if (id) {
-      loadMessages();
-    }
-  }, [username]);
-
     // const handleSendMessage = async () => {
     //   let message = textRef.current.trim();
     //   if (!message) return; // Prevent sending empty messages
@@ -176,40 +140,88 @@ const ChatScreen = ({route, navigation}: any) => {
     //     }
     //   }
 
-    const handleSendMessage = async () => {
-      let message = textRef.current.trim();
-      if (!message) return; // Prevent sending empty messages
-
-      try {
-        await createMessage(await getDBConnection(), id, user?.id, textRef.current);
-        await _query(); // reload all messages from db
-        textRef.current = ''; // clear input
-        inputRef.current?.clear(); // clear UI
-        refresh();
-      } catch (error) {
-        console.error(error);
-        Alert.alert("Error", "Failed to send message");
-      }
+  // get all messages between sender and receiver
+  const _query = async () => {
+    try {
+      setMessages(await getMessagesBetween(await getDBConnection(), user?.id, id));
+    }catch (error) {
+      console.error(error);
+      throw Error('Failed to get chat data !!!');
     }
+  }
 
-    if (loading) {
-      return (
-        <View style={[styles.bg, { justifyContent: 'center', alignItems: 'center', flex: 1 }]}>
-          <LottieView
-            source={require('../assets/animations/loading.json')}
-            autoPlay
-            loop
-            style={{ width: 100, height: 100, marginBottom: 70 }}
-          />
+  // Header and message load
+  useEffect(()=>{
+    navigation.setOptions({
+      headerTitle: () => (
+        <View style={styles.container}>
+          <Image style={styles.image} source={{ uri: image }} />
+          <Text style={styles.name}>{username}</Text>
         </View>
-      );
+      ),
+    });
+
+    // First load into the ChatScreen
+    const loadMessages = async () => {
+      await _query();
+      setTimeout(() => setLoading(false), 1000); // Show loading for at least 3 seconds
+    };
+
+    if (id) {
+      loadMessages();
     }
+  }, [username]);
+
+    const handleSendMessage = async () => {
+      console.log('handleSendMessage triggered'); // <-- confirm it is called
+      console.log('textRef:', textRef.current); // <-- check message content
+      console.log('socket:', socket); // <-- check if socket exists
+
+      let message = textRef.current.trim();
+
+      if (!message || !socket) {
+        console.log('unable to send message')
+        return; // Prevent sending empty messages
+      }
+
+      socket.emit('message_sent', {
+        sender_id: user?.id,
+        receiver_id: id,
+        message: message,
+    })
+
+    console.log('handle send message: ', user?.id, id, message);
+
+    try {
+      const createdAt = new Date().toISOString(); // ISO format, UTC
+      await createMessage(await getDBConnection(), id, user?.id, textRef.current, createdAt);
+      await _query(); // reload all messages from db
+      textRef.current = ''; // clear input
+      inputRef.current?.clear(); // clear UI
+      refresh();
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Error", "Failed to send message");
+    }
+   }
 
     return(
       <View style={styles.bg}>
-         <View style={styles.messagesContainer}>
-          <MessageList messages={messages} currentUser={user} />     
-         </View>
+        <View style={styles.messagesContainer}>
+          {loading ? (
+            <View style={[styles.bg, { justifyContent: 'center', alignItems: 'center', flex: 1 }]}>
+              <LottieView
+                source={require('../assets/animations/loading.json')}
+                autoPlay
+                loop
+                style={{ width: 100, height: 100, marginBottom: 30 }}
+              />
+            </View>
+          ) : (
+            <MessageList messages={messages} currentUser={user} />
+          )} 
+        
+        </View>
 
         <SafeAreaView style={styles.inputContainer}>
           {/* Icon */}
@@ -218,12 +230,15 @@ const ChatScreen = ({route, navigation}: any) => {
           {/* Text Input */}
           <TextInput 
             ref={inputRef}
-            onChangeText={value=>textRef.current = value}
+            onChangeText={value => {
+              console.log('Typed message:', value); // <-- ADD THIS
+              textRef.current = value;
+            }}
             style={styles.input} 
             placeholder="Type your message..."></TextInput>
     
           {/* Icon */}
-          <TouchableOpacity onPress={handleSendMessage}>
+          <TouchableOpacity onPress={()=>{handleSendMessage()}}>
             <Feather style={styles.send} name="send" size={22} color='white' />
           </TouchableOpacity>
         </SafeAreaView>

@@ -3,7 +3,9 @@ import { Text, View, Image, StyleSheet, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import dayjs from 'dayjs';
 import relativeTime from "dayjs/plugin/relativeTime";
-import { getDBConnection, getLastMessage } from '../../db-service/messageService';
+import { getLastMessage } from '../../db-service/messageService';
+import { getUserById } from "../../db-service/userService";
+import { getDBConnection } from "../../db-service/database";
 
 dayjs.extend(relativeTime);
 
@@ -12,14 +14,24 @@ const ChatListItem = ({ chat, currentUser, refresh }) => {
   const id = chat?.id
   const image = chat?.image || 'https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg';
   const username = chat?.username || 'Username';
-  const [ lastMessage, setLastMessage ] = useState({})
+  const [ lastMessage, setLastMessage ] = useState(null)
+  const [ userOfLastMessage, setUserOfLastMessage ] = useState(null)
 
   const _queryLastMessage = async () => {
     try {
       setLastMessage(await getLastMessage(await getDBConnection(), currentUser?.id, id))
     }catch (error) {
       console.error(error);
-        throw Error('Failed to get last message!!!');
+      throw Error('Failed to get last message!!!');
+    }
+  }
+
+  const _queryUserOfLastMessage = async () => {
+    try {
+      setUserOfLastMessage(await getUserById(await getDBConnection(), lastMessage?.sender_id))
+    }catch (error) {
+      console.error(error);
+      throw Error('Failed to get user of last message!!!');
     }
   }
 
@@ -33,9 +45,25 @@ const ChatListItem = ({ chat, currentUser, refresh }) => {
     });
   }
 
-  useEffect(()=>{
-    _queryLastMessage();
-  })
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const db = await getDBConnection();
+        const message = await getLastMessage(db, currentUser?.id, id);
+        setLastMessage(message);
+  
+        // Only fetch user if the sender is not the current user
+        if (message?.sender_id && message.sender_id !== currentUser?.id) {
+          const user = await getUserById(db, message.sender_id);
+          setUserOfLastMessage(user);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+  
+    fetchData();
+  }, [chat, currentUser, refresh]);
 
   return (
     <Pressable onPress={openChatRoom} 
@@ -46,9 +74,17 @@ const ChatListItem = ({ chat, currentUser, refresh }) => {
           <Text numberOfLines={1} 
             style={styles.name}>
               {username}</Text>
-          <Text style={styles.createdAt}>{lastMessage == null ? '' : dayjs(lastMessage.created_at).fromNow()}</Text>
+          <Text style={styles.createdAt}>{lastMessage == null ? '' : dayjs(lastMessage.created_at).format('HH:mm')}</Text>
         </View>
-        <Text numberOfLines={2} style={styles.subTitle}>{lastMessage == null ? '' : lastMessage.text}</Text>
+        <View>
+          <Text numberOfLines={1} style={styles.subTitle} ellipsizeMode="tail">
+          {lastMessage
+            ? `${lastMessage.sender_id === currentUser?.id 
+                ? 'You' 
+                : userOfLastMessage?.username || 'User'}: ${lastMessage.text}`
+            : ''}
+          </Text>
+        </View>
       </View>
     </Pressable>
   )
@@ -82,13 +118,14 @@ const styles = StyleSheet.create({
     flex: 1,
     fontWeight: 'bold',
     fontSize: 17,
+    fontFamily: "Anta-Regular",
   },
   subTitle: {
     color: 'gray',
     fontSize: 14,
   },
   createdAt: {
-    fontSize: 11,
+    fontSize: 13,
     marginRight: 5,
   }
 })

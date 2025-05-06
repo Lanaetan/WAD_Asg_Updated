@@ -1,6 +1,8 @@
 import { useContext, useEffect, useState } from 'react';
 import { View, Text, Button, FlatList, StyleSheet } from 'react-native';
-import { getDBConnection, getUsersExceptCurrent } from '../db-service/userService';
+import { getUsersExceptCurrent } from '../db-service/userService';
+import { getDBConnection } from '../db-service/database';
+import { getMessagesBetween } from '../db-service/messageService';
 let SQLite = require('react-native-sqlite-storage');
 
 const openCallback = () => {
@@ -14,6 +16,7 @@ console.log('Error in opening the database: ' + err);
 const TestDbScreen = ({ navigation }: any) => {
   
   const [users, setUsers] = useState<any>([]);
+  const [messages, setMessages] = useState<any>([]);
 
   const _query = async () => {
     try{
@@ -25,28 +28,58 @@ const TestDbScreen = ({ navigation }: any) => {
     console.log("users in sqlite: ", users);
   }
 
+  const _queryMessage = async () => {
+    try{
+      setMessages(await getMessagesBetween(await getDBConnection(), '1', '3'));
+    }catch (error) {
+      console.error(error);
+      throw Error('Failed to get users except current logged in user !!!');
+    }
+    console.log("messages in sqlite: ", messages);
+  }
+
+
   useEffect(()=>{
     _query();
+    _queryMessage();
   },[]);
 
   return (
     <View>
       <FlatList
-        data={users}
+        data={messages}
         showsVerticalScrollIndicator={true}
         keyExtractor={ (item:any) => 
           item.id.toString()
         }
         renderItem={({item}:any) => (
             <View style={styles.item}>
-              <Text style={styles.itemTitle}>{item.name}</Text>
-              <Text style={styles.itemSubtitle}>
-                {item.email}
-              </Text>
+              <Text style={styles.itemTitle}>{item.sender_id}</Text>
+              <Text style={styles.itemTitle}>{item.receiver_id}</Text>
+              <Text style={styles.itemTitle}>{item.text}</Text>
+              <Text style={styles.itemTitle}>{item.created_at}</Text>
             </View>
         )}
       />
     </View>
+
+    // <View>
+    //   <FlatList
+    //     data={users}
+    //     showsVerticalScrollIndicator={true}
+    //     keyExtractor={ (item:any) => 
+    //       item.id.toString()
+    //     }
+    //     renderItem={({item}:any) => (
+    //         <View style={styles.item}>
+    //           <Text style={styles.itemTitle}>{item.name}</Text>
+    //           <Text style={styles.itemSubtitle}>
+    //             {item.email}
+    //           </Text>
+    //         </View>
+    //     )}
+    //   />
+    // </View>
   );
 };
 

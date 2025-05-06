@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { StyleSheet, Text, View, FlatList, ScrollView } from "react-native";
 import dayjs from 'dayjs';
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -23,16 +23,23 @@ type MessageListProps = {
 
 const MessageList: React.FC<MessageListProps> = ({ messages, currentUser }) => {
 
+  const flatListRef = useRef<any>(null);
+
   useEffect(()=>{
-    console.log('messagelist', messages);
+    // console.log('messagelist', messages);
+    if (flatListRef.current && messages.length > 0) {
+      flatListRef.current.scrollToEnd({ animated: true });
+    }
   },[messages])
 
   return (
     <View>
-      <FlatList 
+      <FlatList
+      ref={flatListRef}
         data={messages}
+        keyExtractor={(item, index) => item.id?.toString() || index.toString()}
         renderItem={({ item }: any) => {
-          console.log('Render item:', item); // Check the structure
+          // console.log('Render item:', item); // Check the structure
           return (
             <Message 
               receiverId={item.receiver_id} 
@@ -43,7 +50,7 @@ const MessageList: React.FC<MessageListProps> = ({ messages, currentUser }) => {
             />
           );
         }}
-        keyExtractor={(item, index) => index.toString()}
+        onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
       />
     </View>
   );

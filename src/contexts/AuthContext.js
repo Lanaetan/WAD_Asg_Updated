@@ -5,8 +5,6 @@ import { auth, db } from '../../firebaseConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getDBConnection } from '../db-service/userService';
 
-
-
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {

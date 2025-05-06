@@ -14,24 +14,58 @@ import {
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Feather from "react-native-vector-icons/Feather";
+import AntDesign from "react-native-vector-icons/AntDesign";
+import socket from "../utils/socket";
 
 import ChatsScreen from "../screens/ChatsScreen";
 import NotificationScreen from "../screens/NotificationScreen";
 import BottomTabNavigator from "./BottomTabNavigator";
 
 import { AuthContext } from "../contexts/AuthContext";
-import { usersRef } from "../../firebaseConfig";
-import { where, query, getDocs } from "firebase/firestore";
-import { getDBConnection, getUserById, getUsers, getUsersExceptCurrent } from '../db-service/userService';
+import { getUsersExceptCurrent } from '../db-service/userService';
+import { getDBConnection } from "../db-service/database";
+import { createMessage } from "../db-service/messageService";
 
 const Drawer = createDrawerNavigator();
 
 const MyDrawerComponent = (props) => {
   const { user, logout } = useContext(AuthContext);
+  const [newMessageFlag, setNewMessageFlag] = useState(false);
 
   const handleLogout = async () => {
     await logout();
   };
+
+  useEffect(() => {
+    const handleMessage = async (data) => {
+      const messageBag = JSON.parse(data);
+      console.log('what is inside messageBag? ', messageBag);
+      const isoTimestamp = new Date(messageBag.created_at).toISOString();
+  
+      try {
+        await createMessage(
+          await getDBConnection(),
+          messageBag.receiver_id,
+          messageBag.sender_id,
+          messageBag.message,
+          isoTimestamp
+        );
+
+        // // Inside handleMessage, after createMessage:
+        // setNewMessageFlag(prev => !prev);
+        
+      } catch (error) {
+        console.error(error);
+        Alert.alert("Error", "Failed to save message");
+      }
+    };
+  
+    socket.on('message_broadcast', handleMessage);
+
+    return () => {
+      socket.off('message_broadcast', handleMessage);
+    };
+  },[])
 
   return (
     <View style={{ flex: 1 }}>
@@ -42,8 +76,7 @@ const MyDrawerComponent = (props) => {
         <ImageBackground
           source={{
             uri:
-              user?.image ||
-              "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg",
+              user?.image || "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg",
           }}
           style={{ padding: 10 }}
         >
@@ -57,8 +90,7 @@ const MyDrawerComponent = (props) => {
             }}
             source={{
               uri:
-                user?.image ||
-                "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg",
+                user?.image || "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg",
             }}
           />
           <Text
@@ -150,25 +182,12 @@ const DrawerNavigator = () => {
   const [users, setUsers] = useState([]);
   const { user } = useContext(AuthContext);
 
-  // Fetch other users except current user - FIREBASE ===========
-  // const getUsers = async () => {
-  //   try {
-  //     const q = query(usersRef, where("userId", "!=", user?.uid));
-  //     const querySnapshot = await getDocs(q);
-
-  //     const data = querySnapshot.docs.map((doc) => doc.data());
-  //     setUsers(data);
-  //   } catch (error) {
-  //     console.error("Error getting users:", error);
-  //   }
-  // };
-
   const _query = async () => {
     try {
       setUsers(await getUsersExceptCurrent(await getDBConnection(), user?.id));
     }catch (error) {
       console.error(error);
-        throw Error('Failed to get users except current logged in user !!!');
+      throw Error('Failed to get users except current logged in user !!!');
     }
   }
 
@@ -182,7 +201,7 @@ const DrawerNavigator = () => {
     <Drawer.Navigator
       drawerContent={(props) => <MyDrawerComponent {...props} />}
       screenOptions={{
-        drawerActiveTintColor: "darkslateblue",
+        drawerActiveTintColor: "white",
         drawerActiveBackgroundColor: "skyblue",
         drawerLabelStyle: {
           marginLeft: -24,
@@ -214,7 +233,7 @@ const DrawerNavigator = () => {
           return {
             title,
             drawerIcon: ({ color }) => (
-              <Ionicons name="notifications-outline" size={24} color={color} />
+              <AntDesign name="smileo" size={24} color={color} />
             ),
             headerLeft: () => (
               <Feather
@@ -247,7 +266,13 @@ const DrawerNavigator = () => {
           ),
         }}
       >
-        {(props) => <ChatsScreen {...props} users={users} refresh={_query} />}
+        {(props) => 
+          <ChatsScreen 
+            {...props} 
+            users={users} 
+            refresh={_query} 
+            // newMessageFlag={newMessageFlag} // 👈 pass it down
+          />}
       </Drawer.Screen>
     </Drawer.Navigator>
   );

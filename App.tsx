@@ -1,12 +1,16 @@
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import React from 'react';
 import Navigator from './src/navigation/index';
-import { AuthProvider, useAuth } from './src/contexts/AuthContext'; // if you're using context
+import { AuthProvider, useAuth } from './src/contexts/AuthContext';
+import { SocketProvider } from './src/contexts/SocketContext';
+
 
 const App = () => {
   return (
     <AuthProvider>
-      <Navigator />
+      <SocketProvider>
+        <Navigator />
+      </SocketProvider>
     </AuthProvider>
   );
 };

@@ -1,25 +1,4 @@
-import {SQLiteDatabase, enablePromise, openDatabase} from 'react-native-sqlite-storage';
-
-const databaseName = 'db.sqlite';
-
-// Enable promise for SQLite
-enablePromise(true);
-
-let dbInstance: SQLiteDatabase | null = null;
-
-export const getDBConnection = async() => {
-  if (dbInstance) {
-    return dbInstance;
-  }
-
-  dbInstance = await openDatabase(
-    { name: databaseName, createFromLocation: '~db.sqlite' },
-    openCallback,
-    errorCallback
-  );
-
-  return dbInstance;
-}
+import {SQLiteDatabase} from 'react-native-sqlite-storage';
 
 export const getUsersExceptCurrent = async (
     db: SQLiteDatabase,
@@ -69,10 +48,11 @@ export const createMessage = async(
     receiver_id: string,
     sender_id: string,
     text: string,
+    created_at: string,
 ) => {
 try{
-    const query = `INSERT INTO messages (receiver_id, sender_id, text, created_at) VALUES (?, ?, ?, datetime('now'))`;
-    const parameters = [receiver_id, sender_id, text];
+    const query = `INSERT INTO messages (receiver_id, sender_id, text, created_at) VALUES (?, ?, ?, ?)`;
+    const parameters = [receiver_id, sender_id, text, created_at];
     await db.executeSql(query,parameters);
   } catch (error) {
     console.error(error);
@@ -110,10 +90,3 @@ export const getLastMessage = async (
 };
 
 
-const openCallback = () => {
-    console.log('database open success');
-}
-
-const errorCallback = (err: any) => {
-    console.log('Error in opening the database: ' + err);
-}

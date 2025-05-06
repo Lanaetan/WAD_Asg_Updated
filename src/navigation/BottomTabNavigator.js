@@ -8,8 +8,6 @@ import Feather from 'react-native-vector-icons/Feather';
 import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import CreatePostScreen from '../screens/CreatePostScreen';
-import ChatsScreen from '../screens/ChatsScreen';
-import LoginScreen from '../screens/TestLoginScreen';
 import TestDbScreen from '../screens/TestDbScreen';
 import TestChatScreen from '../screens/TestChatScreen';
 
@@ -33,19 +31,6 @@ const BottomTabNavigator = () => {
       }}
     >
       <Tab.Screen
-        name="CreatePosts"
-        component={CreatePostScreen}
-        options={{
-          headerTitle: 'Create post',
-          headerTitleStyle: {
-            // fontFamily: "PTSans-Bold",
-          },
-          tabBarIcon: ({ color }) => {
-            return <Feather name="plus-square" size={24} color={ color } />;
-          },
-        }}
-      />
-      <Tab.Screen
         name="Home"
         component={HomeScreen}
         options={({ navigation }) => ({
@@ -64,23 +49,23 @@ const BottomTabNavigator = () => {
         })}
       />
       <Tab.Screen
-        name="Profile"
-        component={ProfileScreen}
+        name="CreatePosts"
+        component={CreatePostScreen}
         options={{
-          headerTitle: 'Profile',
+          headerTitle: 'Create post',
           headerTitleStyle: {
             // fontFamily: "PTSans-Bold",
           },
           tabBarIcon: ({ color }) => {
-            return <Feather name="user" size={24} color={ color } />;
+            return <Feather name="plus-square" size={24} color={ color } />;
           },
         }}
       />
       <Tab.Screen
-        name="Login"
-        component={LoginScreen}
+        name="Profile"
+        component={ProfileScreen}
         options={{
-          headerTitle: 'Login',
+          headerTitle: 'Profile',
           headerTitleStyle: {
             // fontFamily: "PTSans-Bold",
           },
