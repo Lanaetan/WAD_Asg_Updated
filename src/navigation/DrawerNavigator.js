@@ -23,6 +23,7 @@ import ChatsScreen from "../screens/ChatsScreen";
 import BottomTabNavigator from "./BottomTabNavigator";
 import NotificationScreen from "../screens/NotificationScreen";
 import SettingsScreen from "../screens/SettingsScreen";
+import FollowersScreen from "../screens/FollowersScreen";
 
 const Drawer = createDrawerNavigator();
 
@@ -229,6 +230,17 @@ const DrawerNavigator = () => {
           ),
         }}
       />
+
+<Drawer.Screen
+  name="Followers"
+  component={FollowersScreen}
+  options={{
+    drawerIcon: ({ color }) => (
+      <Ionicons name="people-outline" size={24} color={color} />
+    ),
+  }}
+/>
+
     </Drawer.Navigator>
   );
 };
