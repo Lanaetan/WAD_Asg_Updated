@@ -37,7 +37,8 @@ const MessageList: React.FC<MessageListProps> = ({ messages, currentUser }) => {
       <FlatList
       ref={flatListRef}
         data={messages}
-        keyExtractor={(item, index) => item.id?.toString() || index.toString()}
+        // keyExtractor={(item) => item.id?.toString()}
+        keyExtractor={(item: any) => `${item.sender_id}-${item.receiver_id}-${item.created_at}`}
         renderItem={({ item }: any) => {
           // console.log('Render item:', item); // Check the structure
           return (

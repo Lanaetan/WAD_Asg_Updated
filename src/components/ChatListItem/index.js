@@ -6,6 +6,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { getLastMessage } from '../../db-service/messageService';
 import { getUserById } from "../../db-service/userService";
 import { getDBConnection } from "../../db-service/database";
+import socket from "../../utils/socket";
 
 dayjs.extend(relativeTime);
 
@@ -44,8 +45,9 @@ const ChatListItem = ({ chat, currentUser, refresh }) => {
       refresh: refresh,
     });
   }
-
+  
   useEffect(() => {
+    
     const fetchData = async () => {
       try {
         const db = await getDBConnection();

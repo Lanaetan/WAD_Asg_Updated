@@ -42,6 +42,11 @@ const MyDrawerComponent = (props) => {
       console.log('what is inside messageBag? ', messageBag);
       const isoTimestamp = new Date(messageBag.created_at).toISOString();
   
+      // 💡 Optimistic update via an event or context
+      if (typeof props.onNewMessage === 'function') {
+        props.onNewMessage(messageBag);
+      }
+
       try {
         await createMessage(
           await getDBConnection(),
@@ -270,8 +275,7 @@ const DrawerNavigator = () => {
           <ChatsScreen 
             {...props} 
             users={users} 
-            refresh={_query} 
-            // newMessageFlag={newMessageFlag} // 👈 pass it down
+            refresh={_query}
           />}
       </Drawer.Screen>
     </Drawer.Navigator>

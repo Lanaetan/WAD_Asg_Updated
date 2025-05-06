@@ -16,129 +16,16 @@ LogBox.ignoreLogs([
   'Non-serializable values were found in the navigation state',
 ]);
 
-
 const ChatScreen = ({route, navigation}: any) => {
 
   const { id, username, image, refresh } = route.params; // got
   const { user } = useAuth(); 
 
   const [ messages, setMessages ] = useState<any>([]);
-   const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   const textRef = useRef<string>('');
   const inputRef = useRef<any>(null);
-
-  // Socket setup
-  // if using emulator, change to http://10.0.2.2:5000/chat
-  // var socket = io('http://192.168.0.14:5050/chat', {
-  //   transports: ['websocket'],
-  // });
-
-  // Initial socket connection and listeners
-  // useEffect(() => {
-  //   if (!socket) return;    
-
-  //   socket.on('message_broadcast', (data: any) => {
-  //     const messageBag = JSON.parse(data);
-  //     setMessages((prev:any) => [...prev, messageBag]);
-  //     console.log('what is inside messageBag? ', messageBag);
-  //     console.log('message from html: ', messages);
-  //   });
-
-  //   // return () => {
-  //   //   socket.off('message_broadcast', onMessage);
-  //   // };
-  // }, [socket]);
-
-
-
-  // useEffect(() => {
-  //   navigation.setOptions({ 
-  //     title: username
-  //   });
-  //   console.log('id, username, image in chat screen : ', id, username, image);
-  // }, [username]);
-
-  // FIREBASE ==========
-  // const { id, username, image } = route.params;
-  // const { user } = useAuth();
-  // const [messages, setMessages] = useState<any[]>([]);
-
-
-  // useEffect(() => {
-  //   createRoomIfNotExists();
-
-  //   let roomId = getRoomId(user?.userId, id);
-  //   const docRef = doc(db, 'rooms', roomId);
-  //   const messagesRef = collection(docRef, 'messages');
-  //   const q = query(messagesRef, orderBy('createdAt', 'asc'));
-
-  //   let unsub = onSnapshot(q, (querySnapshot) => {
-  //     let allMessages = querySnapshot.docs.map(doc => {
-  //       return doc.data();
-  //     });
-  //     setMessages({ ...allMessages });
-  //   }
-  // )
-  // },[user])
-
-  // const createRoomIfNotExists = async () => {
-  //   let roomId = getRoomId(user?.userId, id);
-  //   console.log("user uid: ", user?.userId);
-  //   console.log("Room ID: ", roomId);
-  //   console.log("Chat ID: ", id);
-  //   await setDoc(doc(db, 'rooms', roomId), {
-  //     roomId,
-  //     createdAt: Timestamp.fromDate(new Date()),
-  //   });
-  // }
-
-  
-    // const handleSendMessage = async () => {
-    //   let message = textRef.current.trim();
-    //   if (!message) return; // Prevent sending empty messages
-    //   try{
-    //     let roomId = getRoomId(user?.userId, id);
-    //     const docRef = doc(db, 'rooms', roomId);
-    //     const messagesRef = collection(docRef, 'messages');
-    //     textRef.current = ''; // Clear the input field after sending the message
-    //     if (inputRef.current) {
-    //       inputRef?.current?.clear(); // Clear the input field after sending the message
-    //     }
-
-    //     const newDoc = await addDoc(messagesRef, {
-    //       userId: user?.userId,
-    //       text: message,
-    //       profileUrl: user?.profileUrl,
-    //       senderName: user?.username,
-    //       createdAt: Timestamp.fromDate(new Date()),
-    //     });
-    //   }catch(error: any){
-    //     Alert.alert("Message", error.message)
-    //   }
-    // }
-
-    // const _createMessage = async () => {
-    //   try {
-    //     const db = await getDBConnection();
-    //     const query = `SELECT * FROM messages WHERE receiver_id = ? AND sender_id = ? OR receiver_id = ? AND sender_id = ? ORDER BY created_at ASC`;
-    //     const query1 = 'INSERT INTO messages(receiver_id,sender_id,text,created_at) VALUES(?,?,?,?,?,?)';
-    //     const parameters = [id, user?.id,textRef.current, now];
-    //   }catch (error) {
-    //     console.error(error);
-    //       throw Error('Failed to create new message !!!');
-    //   }
-    // }
-
-    // const _createMessage = async () => {
-    //     try {
-    //       const result = await createMessage(await getDBConnection(), id, user?.id, textRef.current);
-    //       setMessage(result)
-    //     }catch (error) {
-    //       console.error(error);
-    //       throw Error('Failed to create message !!!');
-    //     }
-    //   }
 
   // get all messages between sender and receiver
   const _query = async () => {
@@ -172,6 +59,39 @@ const ChatScreen = ({route, navigation}: any) => {
     }
   }, [username]);
 
+  useEffect(() => {
+    const loadNewMessage = async (data: any) => {
+      const messageBag = JSON.parse(data);
+      console.log('Received from socket: ', messageBag);
+      console.log('userid', user?.id);
+
+      // Only load message if it's intended for the current user
+      if (
+        messageBag.receiver_id == user?.id &&
+        messageBag.sender_id == id &&
+        messageBag.sender_id !== user?.id // avoid own message
+      ) {
+        setMessages((prevMessages: any) => [
+          ...prevMessages,
+          {
+            created_at: messageBag.created_at,
+            sender_id: messageBag.sender_id,
+            receiver_id: messageBag.receiver_id,
+            text: messageBag.message,
+          },
+        ]);
+        console.log('messages: ', messages);
+      }
+    }
+    
+    socket.on('message_broadcast', loadNewMessage);
+
+    // Clean up the listener on unmount
+  return () => {
+    socket.off('message_broadcast', loadNewMessage);
+  };
+  },[user?.id]);
+
     const handleSendMessage = async () => {
       console.log('handleSendMessage triggered'); // <-- confirm it is called
       console.log('textRef:', textRef.current); // <-- check message content
@@ -195,7 +115,18 @@ const ChatScreen = ({route, navigation}: any) => {
     try {
       const createdAt = new Date().toISOString(); // ISO format, UTC
       await createMessage(await getDBConnection(), id, user?.id, textRef.current, createdAt);
-      await _query(); // reload all messages from db
+
+      // await _query(); // reload all messages from db
+      setMessages((prevMessages: any) => [
+        ...prevMessages,
+        {
+          created_at: createdAt,
+          sender_id: user?.id,
+          receiver_id: id,
+          text: textRef.current,
+        },
+      ]);
+
       textRef.current = ''; // clear input
       inputRef.current?.clear(); // clear UI
       refresh();
