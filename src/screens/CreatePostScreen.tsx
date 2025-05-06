@@ -44,7 +44,6 @@ const CreateScreen = () => {
     );
   };
   
-
   const uploadImageToCloudinary = async (imageUri: string) => {
     const data = new FormData();
     data.append('file', {
@@ -52,7 +51,7 @@ const CreateScreen = () => {
       type: 'image/jpeg',
       name: 'upload.jpg',
     } as any);
-    data.append('upload_preset', 'your_upload_preset');
+    data.append('upload_preset', 'default');
     data.append('cloud_name', 'dnwjfkzcn');
   
     try {
@@ -109,7 +108,7 @@ const CreateScreen = () => {
             </Text>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity onPress={{createPost}} style={styles.postButton}>
+        <TouchableOpacity onPress={createPost} style={styles.postButton}>
           <Text style={styles.postButtonText}>Post Now!</Text>
         </TouchableOpacity>
       </View>
@@ -155,3 +154,4 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
+
