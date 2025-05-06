@@ -3,7 +3,7 @@ import React, { createContext, useEffect, useState, useContext } from 'react';
 import { doc, addDoc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../../firebaseConfig'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getDBConnection } from '../db-service/userService';
+import { getDBConnection } from '../db-service/database';
 
 export const AuthContext = createContext();
 
