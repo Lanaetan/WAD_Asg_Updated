@@ -80,6 +80,7 @@ const usePostData = () => {
   const onRefresh = () => {
     setRefreshing(true);
     fetchPosts();
+    console.info('Latest posts refreshed at:', new Date().toLocaleTimeString());
   };
 
   useEffect(() => {
