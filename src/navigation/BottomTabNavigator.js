@@ -10,6 +10,8 @@ import ProfileScreen from '../screens/ProfileScreen';
 import CreatePostScreen from '../screens/CreatePostScreen';
 import TestDbScreen from '../screens/TestDbScreen';
 import TestChatScreen from '../screens/TestChatScreen';
+import TestCreateFollower from "../screens/TestCreateFollower";
+import TestGetFollower from "../screens/TestGetFollower";
 
 const Tab = createBottomTabNavigator();
 
@@ -89,7 +91,20 @@ const BottomTabNavigator = () => {
       />
       <Tab.Screen
         name="TestChat"
-        component={TestChatScreen}
+        component={TestCreateFollower}
+         options={{
+          headerTitle: 'Login',
+          headerTitleStyle: {
+            // fontFamily: "PTSans-Bold",
+          },
+          tabBarIcon: ({ color }) => {
+            return <Feather name="user" size={24} color={ color } />;
+          },
+        }}
+      />
+      <Tab.Screen
+        name="TestGetFollower"
+        component={TestGetFollower}
          options={{
           headerTitle: 'Login',
           headerTitleStyle: {
