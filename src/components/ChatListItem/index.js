@@ -1,27 +1,95 @@
+import React, { useEffect, useState } from "react";
 import { Text, View, Image, StyleSheet, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-
 import dayjs from 'dayjs';
 import relativeTime from "dayjs/plugin/relativeTime";
+import { getLastMessage } from '../../db-service/messageService';
+import { getUserById } from "../../db-service/userService";
+import { getDBConnection } from "../../db-service/database";
+import socket from "../../utils/socket";
 
 dayjs.extend(relativeTime);
 
-const ChatListItem = ({ chat }) => {
+const ChatListItem = ({ chat, currentUser, refresh }) => {
   const navigation = useNavigation();
+  const id = chat?.id
+  const image = chat?.image || 'https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg';
+  const username = chat?.username || 'Username';
+  const [ lastMessage, setLastMessage ] = useState(null)
+  const [ userOfLastMessage, setUserOfLastMessage ] = useState(null)
+
+  const _queryLastMessage = async () => {
+    try {
+      setLastMessage(await getLastMessage(await getDBConnection(), currentUser?.id, id))
+    }catch (error) {
+      console.error(error);
+      throw Error('Failed to get last message!!!');
+    }
+  }
+
+  const _queryUserOfLastMessage = async () => {
+    try {
+      setUserOfLastMessage(await getUserById(await getDBConnection(), lastMessage?.sender_id))
+    }catch (error) {
+      console.error(error);
+      throw Error('Failed to get user of last message!!!');
+    }
+  }
+
+  const openChatRoom = () => {
+    console.log('ChatListItem', chat);
+    navigation.navigate('Chat', { 
+      id: id, 
+      username: username, 
+      image: image,
+      refresh: refresh,
+    });
+  }
+  
+  useEffect(() => {
+    
+    const fetchData = async () => {
+      try {
+        const db = await getDBConnection();
+        const message = await getLastMessage(db, currentUser?.id, id);
+        setLastMessage(message);
+  
+        // Only fetch user if the sender is not the current user
+        if (message?.sender_id && message.sender_id !== currentUser?.id) {
+          const user = await getUserById(db, message.sender_id);
+          setUserOfLastMessage(user);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+  
+    fetchData();
+  }, [chat, currentUser, refresh]);
 
   return (
-    <Pressable onPress={() => navigation.navigate('Chat', { id: chat.id, name: chat.user.name, image: chat.user.image })} style={styles.container}>
-      <Image source={{ uri: chat.user.image }} style={styles.image} />
+    <Pressable onPress={openChatRoom} 
+      style={styles.container}>
+      <Image source={{ uri: image }} style={styles.image} />
       <View style={styles.content}>
         <View style={styles.row}>
-          <Text numberOfLines={1} style={styles.name}>{chat.user.name}</Text>
-          <Text style={styles.subTitle}>{dayjs(chat.lastMessage.createdAt).fromNow()}</Text>
+          <Text numberOfLines={1} 
+            style={styles.name}>
+              {username}</Text>
+          <Text style={styles.createdAt}>{lastMessage == null ? '' : dayjs(lastMessage.created_at).format('HH:mm')}</Text>
         </View>
-
-        <Text numberOfLines={2} style={styles.subTitle}>{chat.lastMessage.text}</Text>
+        <View>
+          <Text numberOfLines={1} style={styles.subTitle} ellipsizeMode="tail">
+          {lastMessage
+            ? `${lastMessage.sender_id === currentUser?.id 
+                ? 'You' 
+                : userOfLastMessage?.username || 'User'}: ${lastMessage.text}`
+            : ''}
+          </Text>
+        </View>
       </View>
     </Pressable>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -29,12 +97,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginHorizontal: 10,
     marginVertical: 5,
-    height: 70,
+    height: 60,
     alignItems: 'center',
   },
   image: {
-    width: 60,
-    height: 60,
+    width: 55,
+    height: 55,
     borderRadius: 30,
     marginRight: 10,
   },
@@ -52,9 +120,15 @@ const styles = StyleSheet.create({
     flex: 1,
     fontWeight: 'bold',
     fontSize: 17,
+    fontFamily: "Anta-Regular",
   },
   subTitle: {
     color: 'gray',
+    fontSize: 14,
+  },
+  createdAt: {
+    fontSize: 13,
+    marginRight: 5,
   }
 })
 

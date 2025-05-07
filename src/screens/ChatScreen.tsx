@@ -1,97 +1,216 @@
-import React, { useEffect, useState } from "react";
-import { Text, View, ImageBackground, StyleSheet, FlatList, TextInput, Image, ToastAndroid } from "react-native";
-import { useRoute, useNavigation } from "@react-navigation/native";
-import io from 'socket.io-client';
-// import io from 'socket.io-client/dist/socket.io';
+import React, { useEffect, useRef, useState } from "react";
+import { Text, View, StyleSheet, TextInput, Image, Alert, SafeAreaView, TouchableOpacity, LogBox } from "react-native";
+import Feather from "react-native-vector-icons/Feather";
+import LottieView from 'lottie-react-native';
 
+import { useAuth } from "../contexts/AuthContext";
+import { useSocket } from "../contexts/SocketContext";
+import socket from "../utils/socket";
 
-import Message from "../components/Message";
-import InputBox from "../components/InputBox";
+import MessageList from "./MessageList";
 
-// import bg from '../assets/images/luguang.jpg';
-import messages from '../data/messages.json'
+import { getDBConnection } from "../db-service/database";
+import { createMessage, getMessagesBetween } from "../db-service/messageService";
 
+LogBox.ignoreLogs([
+  'Non-serializable values were found in the navigation state',
+]);
 
 const ChatScreen = ({route, navigation}: any) => {
 
-  // const route = useRoute();
-  // const navigation = useNavigation();
+  const { id, username, image, refresh } = route.params; // got
+  const { user } = useAuth(); 
 
-  // useEffect(() => {
-  //   navigation.setOptions({ 
-  //     title: route.params.name 
-  //   });
-  // }, [route.params?.name]);
+  const [ messages, setMessages ] = useState<any>([]);
+  const [loading, setLoading] = useState(true);
 
-  // if using emulator, paste this: http://10.0.2.2:5000/chat
-  var socket = io('http://192.168.0.14:5000/chat', {
-    transports: ['websocket'],
-  });
+  const textRef = useRef<string>('');
+  const inputRef = useRef<any>(null);
 
-  const [name, setName] = useState<any>('Your Name');
-  const [message, setMessage] = useState('');
-  const [chatroom, setChatroom] = useState<any[]>([]);
+  // get all messages between sender and receiver
+  const _query = async () => {
+    try {
+      setMessages(await getMessagesBetween(await getDBConnection(), user?.id, id));
+    }catch (error) {
+      console.error(error);
+      throw Error('Failed to get chat data !!!');
+    }
+  }
 
+  // Header and message load
   useEffect(()=>{
-    // When connected, emit a message to the server to inform that this client has connected to the server.
-    // Display a Toast to inform user that connection was made.
-    socket.on('connect', () => {
-
-      console.log(socket.id); // undefined
-      socket.emit('mobile_client_connected', {connected: true}, (response: any)=>{
-        console.log(response)
-      });
-      ToastAndroid.show('Connected to server', ToastAndroid.LONG);
+    navigation.setOptions({
+      headerTitle: () => (
+        <View style={styles.container}>
+          <Image style={styles.image} source={{ uri: image }} />
+          <Text style={styles.name}>{username}</Text>
+        </View>
+      ),
     });
 
-    socket.on('connect_to_client', (data: any) => {
-      let greets=JSON.parse(data)
-      console.log(greets)
-    });
+    // First load into the ChatScreen
+    const loadMessages = async () => {
+      await _query();
+      setTimeout(() => setLoading(false), 1000); // Show loading for at least 3 seconds
+    };
 
-    // Handle connection error
-    socket.on('error', (error: any) => {
-        ToastAndroid.show('Failed to connect to server', ToastAndroid.LONG);
-    });
-
-    // Receive chat broadcast from server.
-    socket.on('message_broadcast', (data:any) => {
-      console.log(data);
-      let messageBag = JSON.parse(data);
-
-      setChatroom(chatroom => [...chatroom, messageBag]);
-    });
-  },[]);
+    if (id) {
+      loadMessages();
+    }
+  }, [username]);
 
   useEffect(() => {
-      navigation.setOptions({ 
-        headerTitle: () => (
-          <View style={styles.container}>
-            <Image style={styles.image} source={{ uri: route.params.image }}/>
-            <Text style={styles.name}>{ route.params.name }</Text>
-          </View>
-        )
-      });
-    }, [route.params?.name]);
- 
+    const loadNewMessage = async (data: any) => {
+      const messageBag = JSON.parse(data);
+      console.log('Received from socket: ', messageBag);
+      console.log('userid', user?.id);
+
+      // Only load message if it's intended for the current user
+      if (
+        messageBag.receiver_id == user?.id &&
+        messageBag.sender_id == id &&
+        messageBag.sender_id !== user?.id // avoid own message
+      ) {
+        setMessages((prevMessages: any) => [
+          ...prevMessages,
+          {
+            created_at: messageBag.created_at,
+            sender_id: messageBag.sender_id,
+            receiver_id: messageBag.receiver_id,
+            text: messageBag.message,
+          },
+        ]);
+        console.log('messages: ', messages);
+      }
+    }
+    
+    socket.on('message_broadcast', loadNewMessage);
+
+    // Clean up the listener on unmount
+  return () => {
+    socket.off('message_broadcast', loadNewMessage);
+  };
+  },[user?.id]);
+
+    const handleSendMessage = async () => {
+      console.log('handleSendMessage triggered'); // <-- confirm it is called
+      console.log('textRef:', textRef.current); // <-- check message content
+      console.log('socket:', socket); // <-- check if socket exists
+
+      let message = textRef.current.trim();
+
+      if (!message || !socket) {
+        console.log('unable to send message')
+        return; // Prevent sending empty messages
+      }
+
+      socket.emit('message_sent', {
+        sender_id: user?.id,
+        receiver_id: id,
+        message: message,
+    })
+
+    console.log('handle send message: ', user?.id, id, message);
+
+    try {
+      const createdAt = new Date().toISOString(); // ISO format, UTC
+      await createMessage(await getDBConnection(), id, user?.id, textRef.current, createdAt);
+
+      // await _query(); // reload all messages from db
+      setMessages((prevMessages: any) => [
+        ...prevMessages,
+        {
+          created_at: createdAt,
+          sender_id: user?.id,
+          receiver_id: id,
+          text: textRef.current,
+        },
+      ]);
+
+      textRef.current = ''; // clear input
+      inputRef.current?.clear(); // clear UI
+      refresh();
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Error", "Failed to send message");
+    }
+   }
 
     return(
       <View style={styles.bg}>
-        <FlatList
-          // data={messages}
-          data={chatroom}
-          renderItem={({item}) => <Message message={item} user={name}/>}
-        />
-        <InputBox
-/>
+        <View style={styles.messagesContainer}>
+          {loading ? (
+            <View style={[styles.bg, { justifyContent: 'center', alignItems: 'center', flex: 1 }]}>
+              <LottieView
+                source={require('../assets/animations/loading.json')}
+                autoPlay
+                loop
+                style={{ width: 100, height: 100, marginBottom: 30 }}
+              />
+            </View>
+          ) : (
+            <MessageList messages={messages} currentUser={user} />
+          )} 
+        
+        </View>
+
+        <SafeAreaView style={styles.inputContainer}>
+          {/* Icon */}
+          <Feather name="plus" size={24} color='#37b0b0' />
+    
+          {/* Text Input */}
+          <TextInput 
+            ref={inputRef}
+            onChangeText={value => {
+              console.log('Typed message:', value); // <-- ADD THIS
+              textRef.current = value;
+            }}
+            style={styles.input} 
+            placeholder="Type your message..."></TextInput>
+    
+          {/* Icon */}
+          <TouchableOpacity onPress={()=>{handleSendMessage()}}>
+            <Feather style={styles.send} name="send" size={22} color='white' />
+          </TouchableOpacity>
+        </SafeAreaView>
       </View>
     )
 }
 
 const styles = StyleSheet.create({
+inputContainer: {
+    flexDirection: 'row',
+    backgroundColor: 'whitesmoke',
+    padding: 5,
+    paddingHorizontal: 10,
+    alignItems: 'center',
+  },
+  input: {
+    flex: 1,
+    backgroundColor: 'white',
+    padding: 5,
+    paddingHorizontal: 15,
+    marginLeft: 5,
+    marginRight: 10,
+    borderRadius: 50,
+    borderColor: 'lightgray',
+    borderWidth: StyleSheet.hairlineWidth,
+    fontSize: 16,
+  },
+  send: {
+    backgroundColor: '#37b0b0',
+    padding: 7,
+    paddingRight: 9,
+    borderRadius: 30,
+    overflow: 'hidden',
+  },
   bg: {
     flex: 1,
     backgroundColor: '#e3e6e5',
+  },
+  messagesContainer: {
+    flex: 1,
+    paddingBottom: 10,
   },
   container: {
     flexDirection: 'row',

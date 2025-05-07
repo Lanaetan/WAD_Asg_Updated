@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { StyleSheet, View, TextInput, TouchableOpacity, SafeAreaView } from "react-native";
-import Feather from "react-native-vector-icons/Feather"
+import Feather from "react-native-vector-icons/Feather";
 import io from 'socket.io-client';
 
 var socket = io('http://192.168.0.14:5000/chat', {
@@ -8,17 +8,30 @@ var socket = io('http://192.168.0.14:5000/chat', {
 });
 
 
-const InputBox = () => {
-  const [newMessage, setNewMessage] = useState('');
+const InputBox = ({ onChangeText, value, onSendMessage }) => {
+  // const [newMessage, setNewMessage] = useState('');
 
   const onSend = () => {
-    console.warn("Sending a new message: ", newMessage);
-    socket.emit('message_sent', {
-      sender: 'u2', // for example, this should change with user login
-      message: newMessage,
-  })
+  //   console.warn("Sending a new message: ", newMessage);
+  //   socket.emit('message_sent', {
+  //     sender: 'u2', // for example, this should change with user login
+  //     message: newMessage,
+  // })
 
-    setNewMessage('');
+  //   setNewMessage('');
+
+  if (!value.trim()) return; // don't send empty messages
+
+  console.warn("Sending a new message: ", value);
+
+  socket.emit('message_sent', {
+    sender: 'u2', // example user
+    message: value,
+  });
+
+  onSendMessage?.(); // Call parent handler (e.g., to store in Firestore)
+    onChangeText('');  // Clear input
+
   };
 
   return (
@@ -28,8 +41,8 @@ const InputBox = () => {
 
       {/* Text Input */}
       <TextInput 
-        value={newMessage}
-        onChangeText={setNewMessage}
+        value={value}
+        onChangeText={onChangeText}
         style={styles.input} 
         placeholder="Type your message..."></TextInput>
 
