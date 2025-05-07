@@ -103,7 +103,6 @@ const CreateScreen = () => {
       }
       
       // Save post to database or API (to be implemented)
-      // For now, just log the data to console
       console.log('Creating post with:', { title, content, imageUrl });
       
       // Simulate API call delay
@@ -116,7 +115,7 @@ const CreateScreen = () => {
         [{ text: "OK" }]
       );
       
-      // Reset form
+      // Reset create post form data
       setTitle('');
       setContent('');
       setSelectedImage(null);
