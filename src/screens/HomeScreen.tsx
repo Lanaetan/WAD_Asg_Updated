@@ -1,30 +1,20 @@
-import React, {useState, useEffect} from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  Alert,
-  Image,
-  StyleSheet,
-  SafeAreaView,
-  ActivityIndicator,
-} from 'react-native';
-import {getDBConnection} from '../db-service/database';
-import {getPosts} from '../db-service/postService';
-import {getUserById} from '../db-service/userService';
-import {useAuth} from '../contexts/AuthContext';
+import React, { useState, useEffect } from 'react';
+import { View, Text, FlatList, Alert, Image, StyleSheet, SafeAreaView, ActivityIndicator, Dimensions } from 'react-native';
+import { getDBConnection } from '../db-service/database';
+import { getPosts } from '../db-service/postService';
+import { getUserById } from '../db-service/userService';
+import { useAuth } from '../contexts/AuthContext';
 
 const HomeScreen = () => {
-  // State for storing posts and loading status
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [imageDimensions, setImageDimensions] = useState({});
 
-  // Get current user from auth context
-  const {user} = useAuth();
+  const { user } = useAuth();
   const currentUserId = user?.id;
 
-  // Fetches a user's name by their ID from the database
-  const fetchUserName = async userId => {
+  // Fetch username by user ID
+  const fetchUserName = async (userId) => {
     try {
       const db = await getDBConnection();
       const userData = await getUserById(db, userId);
@@ -35,54 +25,68 @@ const HomeScreen = () => {
     }
   };
 
-  // Formats a date string into a readable format
-  const formatDate = dateString => {
+  // Format the date string to a readable format
+  const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleString(); 
+    return date.toLocaleString(); // Convert to a readable format based on the user's locale
   };
 
-  /**
-   * Fetches posts from the database and adds user information
-   * Updates the posts state with fetched data
-   */
-  const fetchPosts = async () => {
-    // Check if user is authenticated
-    if (!currentUserId) {
-      Alert.alert('Error', 'User is not authenticated');
-      return;
-    }
+  // Get image dimensions to properly size it
+  const getImageDimensions = (imageUrl, postId) => {
+    if (!imageUrl) return;
+    
+    // Skip if we already have dimensions for this image
+    if (imageDimensions[postId]) return;
+    
+    Image.getSize(
+      imageUrl,
+      (width, height) => {
+        setImageDimensions(prev => ({
+          ...prev,
+          [postId]: { width, height, ratio: width / height }
+        }));
+      },
+      (error) => {
+        console.error('Error getting image size:', error);
+      }
+    );
+  };
 
+  // Fetch posts from the database
+  const fetchPosts = async () => {
     try {
-      // Get database connection
       const db = await getDBConnection();
-      // Fetch posts data
       const postsData = await getPosts(db, currentUserId);
 
-      // Add user names to each post
       const postsWithUserNames = await Promise.all(
-        postsData.map(async post => {
+        postsData.map(async (post) => {
           const userName = await fetchUserName(post.user_id);
-          return {...post, user_name: userName};
-        }),
+          return { ...post, user_name: userName };
+        })
       );
 
-      // Update state with post data
       setPosts(postsWithUserNames);
+      
+      // Get dimensions for all images
+      postsWithUserNames.forEach(post => {
+        if (post.image) {
+          // Clean the URL if needed - remove any width/height parameters
+          const cleanImageUrl = post.image.replace(/w_\d+/, '').replace(/h_\d+/, '');
+          getImageDimensions(cleanImageUrl, post.id);
+        }
+      });
     } catch (error) {
       console.error('Error fetching posts:', error);
       Alert.alert('Error', 'Failed to load posts.');
     } finally {
-      // Set loading to false regardless of success or failure
       setLoading(false);
     }
   };
 
-  // Fetch posts when component mounts or when user changes
   useEffect(() => {
     fetchPosts();
   }, [currentUserId]);
 
-  // Display loading indicator while fetching data
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -92,47 +96,62 @@ const HomeScreen = () => {
     );
   }
 
-  // Main component render
   return (
     <SafeAreaView style={styles.container}>
       <FlatList
         data={posts}
-        keyExtractor={item => item.id.toString()}
+        keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.listContent}
-        renderItem={({item}) => (
-          <View style={styles.postCard}>
-            <Text style={styles.caption}>{item.caption}</Text>
-            <Text style={styles.postInfo}>Posted by: {item.user_name}</Text>
-            <Text style={styles.postInfo}>
-              Created at: {formatDate(item.created_at)}
-            </Text>
-            <View style={styles.imageContainer}>
-              {item.image ? (
-                <Image
-                  source={{uri: item.image}}
-                  style={styles.postImage}
-                  resizeMode="cover"
-                />
-              ) : (
-                <Text style={styles.noImageText}>No image available</Text>
-              )}
+        renderItem={({ item }) => {
+          // Clean the URL if needed - remove any width/height parameters
+          const imageUrl = item.image ? item.image.replace(/w_\d+/, '').replace(/h_\d+/, '') : null;
+          
+          // Use the screenWidth to calculate proper image height
+          const screenWidth = Dimensions.get('window').width - 52; // Account for padding and margins
+          const postDimensions = imageDimensions[item.id];
+          
+          // Calculate image style with proper aspect ratio
+          const imageStyle = imageUrl ? {
+            width: '100%',
+            height: postDimensions ? screenWidth / postDimensions.ratio : undefined,
+            aspectRatio: postDimensions ? postDimensions.ratio : undefined,
+          } : {};
+          
+          return (
+            <View style={styles.postCard}>
+              <Text style={styles.caption}>{item.caption}</Text>
+              <Text style={styles.postInfo}>Posted by: {item.user_name}</Text>
+              <Text style={styles.postInfo}>Created at: {formatDate(item.created_at)}</Text>
+              <View style={styles.imageContainer}>
+                {imageUrl ? (
+                  <Image
+                    source={{ uri: imageUrl }}
+                    style={[styles.postImage, imageStyle]}
+                    resizeMode="contain" // Use 'contain' to show the full image
+                    onError={(e) => console.log('Image loading error:', e.nativeEvent.error)}
+                  />
+                ) : (
+                  <Text style={styles.noImageText}>No image available</Text>
+                )}
+              </View>
             </View>
-          </View>
-        )}
+          );
+        }}
       />
     </SafeAreaView>
   );
 };
 
+// Get the screen width for responsive sizing
+const screenWidth = Dimensions.get('window').width;
+
 // Styles for the component
 const styles = StyleSheet.create({
-  // Main container - takes up full screen
   container: {
     flex: 1,
     width: '100%',
     backgroundColor: '#f5f5f5',
   },
-  // Container for loading state
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -143,48 +162,45 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 16,
   },
-  // Styling for the FlatList content
   listContent: {
     paddingHorizontal: 16,
     paddingVertical: 12,
+    width: '100%',
   },
-  // Individual post card styling
   postCard: {
     backgroundColor: 'white',
     borderRadius: 8,
-    padding: 16,
+    padding: 10,
     marginBottom: 16,
+    width: '100%',
+    borderWidth: 1,
+    borderColor: '#ccc',
     elevation: 2,
   },
-  // Post title/caption styling
   caption: {
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 8,
   },
-  // Styling for user info and date
   postInfo: {
     fontSize: 14,
     color: '#666',
     marginBottom: 4,
   },
-  // Container for the post image
   imageContainer: {
     marginTop: 12,
-    height: 200,
+    width: '100%',
     borderRadius: 8,
     overflow: 'hidden',
     backgroundColor: '#eee',
   },
-  // Post image styling
   postImage: {
     width: '100%',
-    height: '100%',
+    // Height will be dynamically calculated based on the image's aspect ratio
   },
-  // Styling for the "No image available" text
   noImageText: {
     textAlign: 'center',
-    lineHeight: 200,
+    padding: 20,
     color: '#999',
   },
 });
