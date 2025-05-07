@@ -6,6 +6,9 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  SafeAreaView,
+  StatusBar,
+  ActivityIndicator,
 } from 'react-native';
 import { useCreatePost } from '../contexts/CreatePostContext';
 import styles from '../assets/animations/styles/createPost.style.tsx';
@@ -22,55 +25,71 @@ const CreateScreen = () => {
   } = useCreatePost();
 
   return (
-    <ScrollView>
-      <View style={{ flex: 1, padding: 20 }}>
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+      
+      {/* Header Bar */}     
+      <ScrollView contentContainerStyle={styles.scrollContent}>
         <Text style={styles.header}>What's on your mind?</Text>
-
-        {/* Image Picker */}
-        <TouchableOpacity
-          onPress={pickImage}
-          style={styles.imageWrapper}
-          disabled={isPosting}>
-          <View style={{ position: 'relative' }}>
+        
+        {/* Image Selector */}
+        <TouchableOpacity 
+          onPress={pickImage} 
+          style={[
+            styles.imageWrapper, 
+            selectedImage ? styles.imageWrapperWithImage : {}
+          ]} 
+          disabled={isPosting}
+          activeOpacity={0.7}
+        >
+          {selectedImage ? (
             <Image
-              source={{
-                uri:
-                  selectedImage ||
-                  'https://via.placeholder.com/150?text=Tap+to+choose+photo',
-              }}
+              source={{ uri: selectedImage }}
               style={styles.image}
               resizeMode="cover"
             />
-            {!selectedImage && (
-              <Text style={styles.overlayText}>Tap to select a photo</Text>
-            )}
-          </View>
+          ) : (
+            <Text style={styles.overlayText}>
+              Tap to select a photo
+            </Text>
+          )}
         </TouchableOpacity>
-
+        
         {/* Caption Input */}
         <TextInput
           placeholder="Enter your caption..."
+          placeholderTextColor="#999"
           multiline
           numberOfLines={4}
-          style={[styles.input, errors.caption && styles.inputError]}
+          style={[
+            styles.input, 
+            styles.captionInput,
+            errors.caption ? styles.inputError : null
+          ]}
           value={caption}
-          onChangeText={text => setCaption(text)}
+          onChangeText={setCaption}
+          editable={!isPosting}
         />
-        {errors.caption && (
-          <Text style={styles.errorText}>{errors.caption}</Text>
-        )}
+        {errors.caption && <Text style={styles.errorText}>{errors.caption}</Text>}
 
         {/* Post Button */}
-        <TouchableOpacity
+        <TouchableOpacity 
+          style={[
+            styles.postButton, 
+            (isPosting || !selectedImage) ? styles.postButtonDisabled : {}
+          ]} 
           onPress={createPost}
-          style={[styles.postButton, isPosting && styles.postButtonDisabled]}
-          disabled={isPosting}>
-          <Text style={styles.postButtonText}>
-            {isPosting ? 'Creating Post...' : 'Post Now!'}
-          </Text>
+          disabled={isPosting || !selectedImage}
+          activeOpacity={0.8}
+        >
+          {isPosting ? (
+            <ActivityIndicator color="#fff" size="small" />
+          ) : (
+            <Text style={styles.postButtonText}>Post Now!</Text>
+          )}
         </TouchableOpacity>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
