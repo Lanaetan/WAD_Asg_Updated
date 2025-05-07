@@ -9,6 +9,7 @@ const HomeScreen = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [imageDimensions, setImageDimensions] = useState({});
+  const [refreshing, setRefreshing] = useState(false); // Added state for refreshing
 
   const { user } = useAuth();
   const currentUserId = user?.id;
@@ -54,6 +55,7 @@ const HomeScreen = () => {
 
   // Fetch posts from the database
   const fetchPosts = async () => {
+    setLoading(true);
     try {
       const db = await getDBConnection();
       const postsData = await getPosts(db, currentUserId);
@@ -80,11 +82,18 @@ const HomeScreen = () => {
       Alert.alert('Error', 'Failed to load posts.');
     } finally {
       setLoading(false);
+      setRefreshing(false); // Stop refreshing after the posts are fetched
     }
   };
 
+  // Called when pull to refresh is triggered
+  const onRefresh = () => {
+    setRefreshing(true); // Show the loading indicator for refresh
+    fetchPosts(); // Fetch the latest posts
+  };
+
   useEffect(() => {
-    fetchPosts();
+    fetchPosts(); // Fetch posts when the screen loads
   }, [currentUserId]);
 
   if (loading) {
@@ -137,6 +146,8 @@ const HomeScreen = () => {
             </View>
           );
         }}
+        refreshing={refreshing} // Control the refreshing indicator
+        onRefresh={onRefresh} // Trigger the refresh when the user pulls down
       />
     </SafeAreaView>
   );
