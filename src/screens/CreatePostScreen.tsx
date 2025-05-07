@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useCreatePost } from '../contexts/CreatePostContext';
-import styles from '../assets/animations/styles/createPost.style.tsx';
+import styles from '../assets/styles/createPost.style';
 
 const CreateScreen = () => {
   const {
@@ -28,7 +28,7 @@ const CreateScreen = () => {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       
-      {/* Header Bar */}     
+      {/* Header */}     
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Text style={styles.header}>What's on your mind?</Text>
         

@@ -1,13 +1,20 @@
-import { useState } from 'react';
-import { Alert } from 'react-native';
+import {useState} from 'react';
+import {Alert} from 'react-native';
 import * as ImagePicker from 'react-native-image-picker';
-import { uploadImageToCloudinary } from '../utils/cloudinary';
+import {uploadImageToCloudinary} from '../utils/cloudinary';
+import {getDBConnection} from '../db-service/database';
+import {createPost as createPostInDB} from '../db-service/postService';
+import {useAuth} from '../contexts/AuthContext';
 
 export const useCreatePost = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [caption, setCaption] = useState('');
   const [errors, setErrors] = useState({});
   const [isPosting, setIsPosting] = useState(false);
+
+  // Get current user ID
+  const { user } = useAuth();
+  const currentUserId = user?.id;
 
   // Tap to select image from library
   const pickImage = () => {
@@ -38,17 +45,32 @@ export const useCreatePost = () => {
       setIsPosting(true);
       const imageUrl = selectedImage ? await uploadImageToCloudinary(selectedImage) : null;
 
-      // Simulate API call to create post
-      console.log('Creating post with:', { caption, imageUrl });
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Check if the imageUrl is valid before proceeding
+      if (!imageUrl) {
+        Alert.alert('Error', 'Image upload failed.', [{ text: 'OK' }]);
+        return;
+      }
+
+      // Ensure DB connection
+      const db = await getDBConnection();
+
+      // Check if db is undefined or null (just a safeguard)
+      if (!db) {
+        console.error('Database connection failed!');
+        Alert.alert('Error', 'Failed to connect to the database.', [{ text: 'OK' }]);
+        return;
+      }
+
+      const createdAt = new Date().toISOString(); // Current timestamp
+      await createPostInDB(db, imageUrl, caption, currentUserId, createdAt);
 
       // Show success message
-      console.log('Post created successfully!');
+      console.info('Post created successfully!', imageUrl, caption, currentUserId, createdAt);
       Alert.alert('Success', 'Your post has been created!', [{ text: 'OK' }]);
 
       // Reset form fields
-      setSelectedImage(null);
       setCaption('');
+      setSelectedImage(null);
       setErrors({});
     } catch (error) {
       console.error('Create post error:', error);
@@ -60,9 +82,9 @@ export const useCreatePost = () => {
 
   return {
     caption,
+    setCaption,
     selectedImage,
     setSelectedImage,
-    setCaption,
     errors,
     setErrors,
     isPosting,
