@@ -10,7 +10,7 @@ import {
   StatusBar,
   ActivityIndicator,
 } from 'react-native';
-import { useCreatePost } from '../contexts/CreatePostContext';
+import { useCreatePost } from '../contexts/Post/CreatePostContext';
 import styles from '../assets/styles/createPost.style';
 
 const CreateScreen = () => {
