@@ -43,7 +43,9 @@ export const useCreatePost = () => {
 
     try {
       setIsPosting(true);
+      
       const imageUrl = selectedImage ? await uploadImageToCloudinary(selectedImage) : null;
+      console.log('Image URL:', imageUrl);
 
       // Check if the imageUrl is valid before proceeding
       if (!imageUrl) {
@@ -62,10 +64,13 @@ export const useCreatePost = () => {
       }
 
       const createdAt = new Date().toISOString(); // Current timestamp
+
+      // Insert post into DB
+      console.log('Inserting post into DB:', imageUrl, caption, currentUserId, createdAt);
       await createPostInDB(db, imageUrl, caption, currentUserId, createdAt);
 
       // Show success message
-      console.info('Post created successfully!', imageUrl, caption, currentUserId, createdAt);
+      console.info('Post created successfully!');
       Alert.alert('Success', 'Your post has been created!', [{ text: 'OK' }]);
 
       // Reset form fields

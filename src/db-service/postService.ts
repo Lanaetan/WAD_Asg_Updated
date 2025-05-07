@@ -1,5 +1,6 @@
 import {SQLiteDatabase} from 'react-native-sqlite-storage';
 
+
 // Fetch all posts created by users (excluding the current user if necessary)
 export const getPosts = async (db: SQLiteDatabase, currentUserId: string): Promise<any[]> => {
   try {
@@ -40,19 +41,19 @@ export const getPostById = async (db: SQLiteDatabase, postId: string): Promise<a
 // Create a new post
 export const createPost = async (
   db: SQLiteDatabase,
-  image: string,
+  imageUrl: string,
   caption: string,
   userId: string,
   createdAt: string
 ) => {
-  try {
-    const query = `INSERT INTO posts (image, caption, created_at, user_id) VALUES (?, ?, ?, ?)`;
-    const parameters = [image, caption, createdAt, userId];
-    await db.executeSql(query, parameters);
-  } catch (error) {
-    console.error(error);
-    throw Error('Failed to create post!');
-  }
+    try {
+        const query = `INSERT INTO posts (image, caption, user_id, created_at) VALUES (?, ?, ?, ?)`;
+        const result = await db.executeSql(query, [imageUrl, caption, userId, createdAt]);
+        console.log('Post inserted into DB:', result);
+      } catch (error) {
+        console.error('Error inserting post into DB:', error);
+        throw error;
+      }
 };
 
 // Fetch posts made by a specific user
@@ -74,3 +75,5 @@ export const getPostsByUser = async (db: SQLiteDatabase, userId: string): Promis
     throw Error('Failed to get posts by user!');
   }
 };
+
+
