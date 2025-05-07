@@ -20,7 +20,7 @@ const usePostData = () => {
     try {
       const db = await getDBConnection();
       const userData = await getUserById(db, userId);
-      return userData?.name || 'Unknown';
+      return userData?.username || 'Unknown';
     } catch (error) {
       console.error('Error fetching user name:', error);
       return 'Unknown';
