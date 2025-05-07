@@ -1,12 +1,14 @@
 import {SQLiteDatabase} from 'react-native-sqlite-storage';
 
-
-// Fetch all posts created by users (excluding the current user if necessary)
-export const getPosts = async (db: SQLiteDatabase, currentUserId: string): Promise<any[]> => {
+// Fetch all posts created by users (including the current user)
+export const getPosts = async (
+  db: SQLiteDatabase,
+  currentUserId: string,
+): Promise<any[]> => {
   try {
     const postsData: any[] = [];
-    const query = `SELECT * FROM posts WHERE user_id != ? ORDER BY created_at DESC`;
-    const results = await db.executeSql(query, [currentUserId]);
+    const query = `SELECT * FROM posts WHERE user_id = ? OR user_id != ? ORDER BY created_at DESC`;
+    const results = await db.executeSql(query, [currentUserId, currentUserId]);
 
     results.forEach((result: any) => {
       result.rows.raw().forEach((item: any) => {
@@ -22,7 +24,10 @@ export const getPosts = async (db: SQLiteDatabase, currentUserId: string): Promi
 };
 
 // Fetch a single post by its ID
-export const getPostById = async (db: SQLiteDatabase, postId: string): Promise<any> => {
+export const getPostById = async (
+  db: SQLiteDatabase,
+  postId: string,
+): Promise<any> => {
   try {
     const query = `SELECT * FROM posts WHERE id = ?`;
     const results = await db.executeSql(query, [postId]);
@@ -44,20 +49,28 @@ export const createPost = async (
   imageUrl: string,
   caption: string,
   userId: string,
-  createdAt: string
+  createdAt: string,
 ) => {
-    try {
-        const query = `INSERT INTO posts (image, caption, user_id, created_at) VALUES (?, ?, ?, ?)`;
-        const result = await db.executeSql(query, [imageUrl, caption, userId, createdAt]);
-        console.log('Post inserted into DB:', result);
-      } catch (error) {
-        console.error('Error inserting post into DB:', error);
-        throw error;
-      }
+  try {
+    const query = `INSERT INTO posts (image, caption, user_id, created_at) VALUES (?, ?, ?, ?)`;
+    const result = await db.executeSql(query, [
+      imageUrl,
+      caption,
+      userId,
+      createdAt,
+    ]);
+    console.log('Post inserted into DB:', result);
+  } catch (error) {
+    console.error('Error inserting post into DB:', error);
+    throw error;
+  }
 };
 
 // Fetch posts made by a specific user
-export const getPostsByUser = async (db: SQLiteDatabase, userId: string): Promise<any[]> => {
+export const getPostsByUser = async (
+  db: SQLiteDatabase,
+  userId: string,
+): Promise<any[]> => {
   try {
     const userPostsData: any[] = [];
     const query = `SELECT * FROM posts WHERE user_id = ? ORDER BY created_at DESC`;
@@ -75,5 +88,3 @@ export const getPostsByUser = async (db: SQLiteDatabase, userId: string): Promis
     throw Error('Failed to get posts by user!');
   }
 };
-
-
