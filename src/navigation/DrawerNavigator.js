@@ -107,11 +107,8 @@ const MyDrawerComponent = (props) => {
                 marginLeft: 10,
               }}
             >
-              {user.name}
+              {user?.name}
             </Text>
-
-            
-            
         </ImageBackground>
 
         <View style={{ backgroundColor: "#fff", flex: 1, paddingTop: 10 }}>

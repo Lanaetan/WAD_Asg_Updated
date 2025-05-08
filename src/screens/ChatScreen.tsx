@@ -117,7 +117,6 @@ const ChatScreen = ({route, navigation}: any) => {
           text: textRef.current,
         },
       ]);
-
       textRef.current = ''; // clear input
       inputRef.current?.clear(); // clear UI
       refresh();

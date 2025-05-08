@@ -1,6 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TextInput, Image } from 'react-native';
+import Feather from 'react-native-vector-icons/Feather';
 import { getDBConnection } from '../db-service/database';
 import { useAuth } from '../contexts/AuthContext';
 import { TouchableOpacity } from 'react-native-gesture-handler';
@@ -14,11 +15,11 @@ const SearchScreen = () => {
   
   const _queryUsersExceptCurrent = async () => {
     try{
-        setUsers(await getUsers(await getDBConnection(), user.id));
-      }catch (error) {
-        console.error(error);
-        throw Error('Failed to get users !!!');
-      }
+      setUsers(await getUsers(await getDBConnection(), user.id));
+    }catch (error) {
+      console.error(error);
+      throw Error('Failed to get users !!!');
+    }
   }
 
   useEffect(() => {
@@ -33,13 +34,18 @@ const SearchScreen = () => {
 
   return (
   <View style={styles.container}>
-    <TextInput
-      placeholder="Search"
-      value={searchQuery}
-      onChangeText={setSearchQuery}
-      style={styles.input}
-    />
-
+    <View style={styles.searchContainer}>
+      <Feather 
+        name="search" 
+        size={24} />
+      <TextInput
+        placeholder="Search"
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+        style={styles.input}
+      />
+    </View>
+    
     <FlatList
       data={filteredData}
       showsVerticalScrollIndicator={false}
@@ -55,9 +61,8 @@ const SearchScreen = () => {
             <Text style={styles.item}>{item.username}</Text>
           </View>
       </TouchableOpacity>
-    )}
-  />
-
+      )}
+    />
   </View>
   );
 }
@@ -67,15 +72,23 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20
   },
-  input: {
-    height: 40,
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'lightgrey',
     borderColor: '#ccc',
     borderWidth: 1,
-    paddingHorizontal: 15,
-    marginTop: 10,
+    borderRadius: 30,
+    paddingHorizontal: 10,
+    marginTop: 15,
     marginBottom: 10,
-    borderRadius: 20,
-    backgroundColor: 'lightgrey',
+    paddingVertical: 8,
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    paddingVertical: 0, 
+    paddingLeft: 8, 
   },
   item: {
     fontSize: 16,
