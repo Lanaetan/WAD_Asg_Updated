@@ -14,6 +14,9 @@ import UserProfileScreen from '../screens/UserProfileScreen';
 import FollowersScreen from '../screens/FollowersScreen';
 import DrawerNavigator from './DrawerNavigator';
 import BottomTabNavigator from './BottomTabNavigator';
+import EditProfileScreen from '../screens/EditProfile';
+import WelcomeScreen from '../screens/WelcomeScreen';
+
 
 // Ignore specific warning logs
 LogBox.ignoreLogs(['EventEmitter.removeListener']);
@@ -71,35 +74,43 @@ const Navigator = () => {
       };
     }, []);
 
-  return (
-    <NavigationContainer>
-      <Stack.Navigator
-        screenOptions={{
-          headerStyle: { backgroundColor: 'whitesmoke' },
-        }}
-      >
-        {isAuthenticated ? (
-          <>
-            <Stack.Screen
-              name="Drawer"
-              component={DrawerNavigator}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen name="BottomTabs" component={BottomTabNavigator} />
-            <Stack.Screen name="UserProfile" component={UserProfileScreen} />
-            <Stack.Screen name="Followers" component={FollowersScreen} />
-            <Stack.Screen name="Chat" component={ChatScreen} />
-            <Stack.Screen name="Contacts" component={ContactsScreen} />
-          </>
-        ) : (
-          <>
-            <Stack.Screen name="SignIn" component={SignIn} />
-            <Stack.Screen name="SignUp" component={SignUp} />
-          </>
-        )}
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
+    return (
+      <NavigationContainer>
+        <Stack.Navigator
+          screenOptions={{
+            headerStyle: { backgroundColor: 'whitesmoke' },
+          }}
+        >
+          {isAuthenticated ? (
+            <>
+              <Stack.Screen
+                name="Drawer"
+                component={DrawerNavigator}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen name="BottomTabs" component={BottomTabNavigator} />
+              <Stack.Screen name="UserProfile" component={UserProfileScreen} />
+              <Stack.Screen name="Followers" component={FollowersScreen} />
+              <Stack.Screen name="Chat" component={ChatScreen} />
+              <Stack.Screen name="Contacts" component={ContactsScreen} />
+              <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+            </>
+          ) : (
+            <>
+              <Stack.Screen
+                name="Welcome"
+                component={WelcomeScreen}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen name="SignIn" component={SignIn} />
+              <Stack.Screen name="SignUp" component={SignUp} />
+            </>
+          )}
+        </Stack.Navigator>
+      </NavigationContainer>
+    );    
+
 };
 
 export default Navigator;
+
