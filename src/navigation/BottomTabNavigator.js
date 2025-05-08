@@ -6,10 +6,7 @@ import Feather from 'react-native-vector-icons/Feather';
 import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import CreatePostScreen from '../screens/CreatePostScreen';
-import TestDbScreen from '../screens/TestDbScreen';
 import SearchScreen from '../screens/SearchScreen';
-import TestCreateFollower from "../screens/TestCreateFollower";
-import TestGetFollower from "../screens/TestGetFollower";
 
 const Tab = createBottomTabNavigator();
 
@@ -72,36 +69,6 @@ const BottomTabNavigator = () => {
         component={ProfileScreen}
         options={{
           headerTitle: 'Profile',
-          tabBarIcon: ({ color }) => {
-            return <Feather name="user" size={24} color={ color } />;
-          },
-        }}
-      />
-       <Tab.Screen
-        name="TestDb"
-        component={TestDbScreen}
-         options={{
-          headerTitle: 'Login',
-          tabBarIcon: ({ color }) => {
-            return <Feather name="user" size={24} color={ color } />;
-          },
-        }}
-      />
-      <Tab.Screen
-        name="TestChat"
-        component={TestCreateFollower}
-         options={{
-          headerTitle: 'Login',
-          tabBarIcon: ({ color }) => {
-            return <Feather name="user" size={24} color={ color } />;
-          },
-        }}
-      />
-      <Tab.Screen
-        name="TestGetFollower"
-        component={TestGetFollower}
-         options={{
-          headerTitle: 'Login',
           tabBarIcon: ({ color }) => {
             return <Feather name="user" size={24} color={ color } />;
           },
