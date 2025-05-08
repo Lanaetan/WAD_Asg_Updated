@@ -56,7 +56,7 @@ const Button = () => {
         <Ionicons
           style={styles.button}
           name={'chatbubbles-outline'}
-          color="#3A59D1"
+          color="black"
         />
       </TouchableOpacity>
     </View>

@@ -23,7 +23,7 @@ const HomeScreen = () => {
   const currentUserId = user?.id;
 
   // Fetch user name by ID
-  const fetchUserName = async (userId) => {
+  const fetchUserName = async (userId: any) => {
     try {
       const db = await getDBConnection();
       const userData = await getUserById(db, userId);
