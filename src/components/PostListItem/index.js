@@ -1,29 +1,30 @@
-import React, {useState, useEffect} from 'react';
-import {View, Text, Image, Dimensions, StyleSheet} from 'react-native';
-import {TouchableOpacity} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, Image, Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import moment from 'moment';
+import { useAuth } from '../../contexts/AuthContext';
 import styles from '../../assets/styles/HomeScreen.style';
 import LikeButton from './LikeButton';
 import CommentButton from './CommentButton';
-import {useAuth} from '../../contexts/AuthContext';
+import { translateText } from './TranslateCaption'; // Import the translation function
 
-const PostListItem = ({post}) => {
+const PostListItem = ({ post }) => {
   const navigation = useNavigation();
-  const {user} = useAuth();
+  const { user } = useAuth();
   const [isExpanded, setIsExpanded] = useState(false);
   const [shouldShowToggle, setShouldShowToggle] = useState(false);
   const [imageDimensions, setImageDimensions] = useState(null);
   const [timeAgo, setTimeAgo] = useState('');
+  const [translatedCaption, setTranslatedCaption] = useState('');
   const screenWidth = Dimensions.get('window').width - 52;
 
   // Get time ago text
-  const getTimeAgo = dateString => {
+  const getTimeAgo = (dateString) => {
     return moment(dateString).fromNow();
   };
 
   // Removing width and height parameters from image url
-  const cleanImageUrl = url =>
+  const cleanImageUrl = (url) =>
     url ? url.replace(/w_\d+/, '').replace(/h_\d+/, '') : null;
 
   useEffect(() => {
@@ -44,17 +45,23 @@ const PostListItem = ({post}) => {
       Image.getSize(
         imageUrl,
         (width, height) => {
-          setImageDimensions({width, height, ratio: width / height});
+          setImageDimensions({ width, height, ratio: width / height });
         },
-        error => console.error('Error getting image size:', error),
+        (error) => console.error('Error getting image size:', error)
       );
     }
   }, [post.image]);
 
+  // Translate caption to Chinese
+  const handleTranslate = async () => {
+    const translated = await translateText(post.caption);
+    if (translated) setTranslatedCaption(translated);
+  };
+
   // Navigate to user profile when username is pressed
   const handleUsernamePress = () => {
     navigation.navigate('UserProfile', {
-      searchedUser: {id: post.user_id, username: post.user_name},
+      searchedUser: { id: post.user_id, username: post.user_name },
     });
   };
 
@@ -76,12 +83,13 @@ const PostListItem = ({post}) => {
         <Text
           style={styles.caption}
           numberOfLines={isExpanded ? 0 : 4}
-          onTextLayout={e => {
+          onTextLayout={(e) => {
             if (e.nativeEvent.lines.length > 4 && !shouldShowToggle) {
               setShouldShowToggle(true);
             }
-          }}>
-          {post.caption}
+          }}
+        >
+          {translatedCaption || post.caption}
         </Text>
 
         {shouldShowToggle && (
@@ -91,16 +99,21 @@ const PostListItem = ({post}) => {
             </Text>
           </TouchableOpacity>
         )}
+
+        {/* Translate Button */}
+        <TouchableOpacity onPress={handleTranslate}>
+          <Text style={styles.translateButton}>Translate to Chinese</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Post Image Container */}
       <View style={styles.imageContainer}>
         {imageUrl ? (
           <Image
-            source={{uri: imageUrl}}
+            source={{ uri: imageUrl }}
             style={[styles.postImage, imageStyle]}
             resizeMode="contain"
-            onError={e =>
+            onError={(e) =>
               console.log('Image loading error:', e.nativeEvent.error)
             }
           />
@@ -112,13 +125,14 @@ const PostListItem = ({post}) => {
       {/* Post Footer */}
       <View style={styles.footer}>
         <View style={styles.ButtonTab}>
-          <LikeButton></LikeButton>
+          <LikeButton />
           {user && <CommentButton postId={post.id} userId={user.id} />}
         </View>
         <View style={styles.userInfo}>
           <TouchableOpacity
             onPress={handleUsernamePress}
-            style={styles.userRow}>
+            style={styles.userRow}
+          >
             <Text style={styles.username}>Posted by {post.user_name}</Text>
           </TouchableOpacity>
         </View>
