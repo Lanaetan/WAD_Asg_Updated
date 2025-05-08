@@ -120,20 +120,6 @@ const MyDrawerComponent = (props) => {
       </DrawerContentScrollView>
 
       <View style={{ padding: 15, borderTopWidth: 1, borderTopColor: "grey" }}>
-        <TouchableOpacity style={{ paddingVertical: 10 }}>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Ionicons name="settings-outline" size={20} />
-            <Text
-              style={{
-                marginLeft: 10,
-                fontSize: 15,
-                fontFamily: "Anta-Regular",
-              }}
-            >
-              Settings
-            </Text>
-          </View>
-        </TouchableOpacity>
         <TouchableOpacity style={{ paddingVertical: 10 }} onPress={handleLogout}>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Ionicons name="exit-outline" size={20} />
