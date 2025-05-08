@@ -3,8 +3,9 @@ import {StyleSheet} from 'react-native';
 export default StyleSheet.create({
   centeredView: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
     alignItems: 'center',
+    paddingTop: 100,
   },
   overlay: {
     position: 'absolute',
@@ -27,20 +28,10 @@ export default StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
-    width: '80%',
-    maxWidth: 400,
+    width: '100%',
+    minHeight: 400,
+    maxWidth: 700,
     zIndex: 10, // Ensure it's above the overlay
-  },
-  button: {
-    borderRadius: 20,
-    padding: 10,
-    elevation: 2,
-  },
-  buttonOpen: {
-    backgroundColor: '#F194FF',
-  },
-  buttonClose: {
-    backgroundColor: '#2196F3',
   },
   textStyle: {
     color: 'white',

@@ -67,7 +67,8 @@ export default StyleSheet.create({
   // Post Buttons
   ButtonTab: {
     flexDirection: 'row',
-    
+    marginTop: 5,
+    marginBottom: 10,
   },
   button: {
     fontSize: 28,

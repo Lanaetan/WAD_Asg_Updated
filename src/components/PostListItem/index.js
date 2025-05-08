@@ -109,11 +109,11 @@ const PostListItem = ({post}) => {
 
       {/* Post Footer */}
       <View style={styles.footer}>
-        <Text style={styles.timeInfo}>{timeAgo}</Text>
         <View style={styles.ButtonTab}>
           <LikeButton onPress={handleLikePress}></LikeButton>
           <CommentButton onPress={handleCommentPress}></CommentButton>
         </View>
+        <Text style={styles.timeInfo}>{timeAgo}</Text>
       </View>
     </View>
   );
