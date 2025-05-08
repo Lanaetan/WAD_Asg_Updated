@@ -1,69 +1,71 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   FlatList,
-  Image,
-  Dimensions,
   SafeAreaView,
   ActivityIndicator,
+  Alert
 } from 'react-native';
-import usePostData from '../contexts/Post/HomeScreenContext';
+import { getDBConnection } from '../db-service/database';
+import { getPosts } from '../db-service/postService';
+import { getUserById } from '../db-service/userService';
+import { useAuth } from '../contexts/AuthContext';
+import PostListItem from '../components/PostListItem';
 import styles from '../assets/styles/HomeScreen.style';
 
 const HomeScreen = () => {
-  const {
-    posts,
-    loading,
-    refreshing,
-    imageDimensions,
-    onRefresh,
-    formatDate,
-    cleanImageUrl,
-  } = usePostData();
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const screenWidth = Dimensions.get('window').width - 52;
+  const { user } = useAuth();
+  const currentUserId = user?.id;
 
-  const renderItem = ({ item }: any) => {
-    const imageUrl = cleanImageUrl(item.image);
-    const postDimensions = imageDimensions[item.id];
-
-    const imageStyle = imageUrl
-      ? {
-          width: '100%',
-          height: postDimensions
-            ? screenWidth / postDimensions.ratio
-            : undefined,
-          aspectRatio: postDimensions?.ratio,
-        }
-      : {};
-
-    return (
-      // Post Card
-      <View style={styles.postCard}>
-        {/* Post Header */}
-        <Text style={styles.caption}>{item.caption}</Text>
-        <Text style={styles.postInfo}>Posted by: {item.user_name}</Text>
-        <Text style={styles.postInfo}>Created at: {formatDate(item.created_at)}</Text>
-        
-        {/* Post Image */}
-        <View style={styles.imageContainer}>
-          {imageUrl ? (
-            <Image
-              source={{ uri: imageUrl }}
-              style={[styles.postImage, imageStyle]}
-              resizeMode="contain"
-              onError={(e) => console.log('Image loading error:', e.nativeEvent.error)}
-            />
-          ) : (
-            // Placeholder for no image 
-            // Maybe image was deleted or is currently not available
-            <Text style={styles.noImageText}>No image available</Text>
-          )}
-        </View>
-      </View>
-    );
+  // Fetch user name by ID
+  const fetchUserName = async (userId: any) => {
+    try {
+      const db = await getDBConnection();
+      const userData = await getUserById(db, userId);
+      return userData?.username || 'Unknown';
+    } catch (error) {
+      console.error('Error fetching user name:', error);
+      return 'Unknown';
+    }
   };
+
+  // Fetch posts from the database
+  const fetchPosts = async () => {
+    setLoading(true);
+    try {
+      const db = await getDBConnection();
+      const postsData = await getPosts(db, currentUserId);
+      const postsWithUserNames = await Promise.all(
+        postsData.map(async (post) => ({
+          ...post,
+          user_name: await fetchUserName(post.user_id),
+        }))
+      );
+      setPosts(postsWithUserNames);
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+      Alert.alert('Error', 'Failed to load posts.');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  // Refresh posts when user pulls down
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchPosts();
+    console.info('Latest posts refreshed at:', new Date().toLocaleTimeString());
+  };
+
+  useEffect(() => {
+    fetchPosts();
+  }, [currentUserId]);
 
   if (loading) {
     return (
@@ -80,7 +82,11 @@ const HomeScreen = () => {
         data={posts}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.listContent}
-        renderItem={renderItem}
+        renderItem={({ item }) => (
+          <View>
+            <PostListItem post={item} />
+          </View>
+        )}
         refreshing={refreshing}
         onRefresh={onRefresh}
       />
