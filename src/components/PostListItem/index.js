@@ -6,11 +6,13 @@ import moment from 'moment';
 import styles from '../../assets/styles/HomeScreen.style';
 import LikeButton from './LikeButton';
 import CommentButton from './CommentButton';
-import { useAuth } from '../../contexts/AuthContext';
+import {useAuth} from '../../contexts/AuthContext';
 
 const PostListItem = ({post}) => {
   const navigation = useNavigation();
-  const { user } = useAuth(); // Retrieve the user from context
+  const {user} = useAuth();
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [shouldShowToggle, setShouldShowToggle] = useState(false);
   const [imageDimensions, setImageDimensions] = useState(null);
   const [timeAgo, setTimeAgo] = useState('');
   const screenWidth = Dimensions.get('window').width - 52;
@@ -70,15 +72,25 @@ const PostListItem = ({post}) => {
   return (
     <View style={styles.postCard}>
       {/* Post Header */}
-      <View style={styles.header}>
-        <Text style={styles.caption}>{post.caption}</Text>
-        <View style={styles.userInfo}>
-          <TouchableOpacity
-            onPress={handleUsernamePress}
-            style={styles.userRow}>
-            <Text style={styles.username}>Posted by: {post.user_name}</Text>
+      <View>
+        <Text
+          style={styles.caption}
+          numberOfLines={isExpanded ? 0 : 4}
+          onTextLayout={e => {
+            if (e.nativeEvent.lines.length > 4 && !shouldShowToggle) {
+              setShouldShowToggle(true);
+            }
+          }}>
+          {post.caption}
+        </Text>
+
+        {shouldShowToggle && (
+          <TouchableOpacity onPress={() => setIsExpanded(!isExpanded)}>
+            <Text style={styles.readMoreText}>
+              {isExpanded ? 'See less' : 'See more'}
+            </Text>
           </TouchableOpacity>
-        </View>
+        )}
       </View>
 
       {/* Post Image Container */}
@@ -102,6 +114,13 @@ const PostListItem = ({post}) => {
         <View style={styles.ButtonTab}>
           <LikeButton></LikeButton>
           {user && <CommentButton postId={post.id} userId={user.id} />}
+        </View>
+        <View style={styles.userInfo}>
+          <TouchableOpacity
+            onPress={handleUsernamePress}
+            style={styles.userRow}>
+            <Text style={styles.username}>Posted by {post.user_name}</Text>
+          </TouchableOpacity>
         </View>
         <Text style={styles.timeInfo}>{timeAgo}</Text>
       </View>

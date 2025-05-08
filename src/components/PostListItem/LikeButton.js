@@ -14,7 +14,7 @@ const Button = () => {
 
     return (
         <View>
-            {/* Button to like post */}
+            {/* Like Button */}
             <TouchableOpacity onPress={() => toggleLike()}>
                 <Ionicons  
                     style={styles.button}

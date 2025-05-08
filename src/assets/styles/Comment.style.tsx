@@ -29,8 +29,6 @@ export default StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
     width: '100%',
-    minHeight: 200,
-    maxWidth: 700,
     zIndex: 10, // Ensure it's above the overlay
   },
   textStyle: {
@@ -45,7 +43,7 @@ export default StyleSheet.create({
   // Comment display section
   commentList: {
     width: '100%',
-    maxHeight: 200, // Limit height for better scrollability
+    maxHeight: '80%', // Limit height for better scrollability
     marginBottom: 15,
   },
   noCommentsText: {

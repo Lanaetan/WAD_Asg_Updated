@@ -27,14 +27,18 @@ export default StyleSheet.create({
     borderColor: '#ccc',
     elevation: 2,
   },
-  header: {
-
-  },
+  // Header
   caption: {
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 8,
+    color: 'black',
   },
+  readMoreText: {
+    color: 'grey',
+    marginTop: 4,
+    fontSize: 14,
+  },  
   postInfo: {
     fontSize: 14,
     color: '#666',
@@ -74,4 +78,22 @@ export default StyleSheet.create({
     fontSize: 28,
     marginRight: 8,
   },
+  count: {
+    marginLeft: 4
+  },
+  // User info
+  userInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  userRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  username: {
+    fontSize: 14,
+    color: '#333',
+    fontWeight: '500',
+  },  
 });

@@ -15,19 +15,32 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import moment from 'moment';
 
 import styles from '../../assets/styles/HomeScreen.style';
-import stylesCommentModal from '../../assets/styles/CommentModal.style';
+import stylesCommentModal from '../../assets/styles/Comment.style';
 
 import {
   createComment,
   getCommentsByPost,
+  countCommentsByPost,
 } from '../../db-service/commentService';
 
 import {getDBConnection} from '../../db-service/database';
 
 const CommentButton = ({postId, userId}) => {
+  const [commentCount, setCommentCount] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
   const [commentText, setCommentText] = useState('');
   const [comments, setComments] = useState([]);
+
+  // Fetch number of comments for post
+  const updateCommentCount = async () => {
+    try {
+      const db = await getDBConnection();
+      const count = await countCommentsByPost(db, postId);
+      setCommentCount(count);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   // Fetch comments when the modal opens
   const fetchComments = async () => {
@@ -61,15 +74,21 @@ const CommentButton = ({postId, userId}) => {
       const createdAt = new Date().toISOString();
       await createComment(db, commentText, createdAt, postId, userId);
 
+      // After posting comments, reset everything
       setCommentText('');
       setModalVisible(false);
-      fetchComments(); // Reload comments after posting a new one
+      fetchComments();
+      updateCommentCount();
       Alert.alert('Success', 'Comment posted!');
     } catch (err) {
       console.error(err);
       Alert.alert('Error', 'Failed to post comment.');
     }
   };
+
+  useEffect(() => {
+    updateCommentCount();
+  }, []);
 
   return (
     <View>
@@ -132,13 +151,17 @@ const CommentButton = ({postId, userId}) => {
         </SafeAreaProvider>
       </Modal>
 
-      <TouchableOpacity onPress={openModal}>
+      {/* Comment Button */}
+      <TouchableOpacity
+        onPress={openModal}
+        style={{flexDirection: 'row', alignItems: 'center'}}>
         <Ionicons
           style={styles.button}
           name="chatbubbles-outline"
           size={24}
           color="black"
         />
+        <Text style={styles.Count}>{commentCount}</Text>
       </TouchableOpacity>
     </View>
   );
