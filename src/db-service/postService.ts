@@ -88,3 +88,23 @@ export const getPostsByUser = async (
     throw Error('Failed to get posts by user!');
   }
 };
+
+export const countPosts = async (
+  db: SQLiteDatabase,
+  userId: string,
+): Promise<number> => {
+  try {
+    const query = `SELECT COUNT(*) as count FROM posts WHERE user_id = ?`;
+    const results = await db.executeSql(query, [userId]);
+
+    if (results.length > 0 && results[0].rows.length > 0) {
+      const count = results[0].rows.item(0).count;
+      return count;
+    }
+
+    return 0;
+  } catch (error) {
+    console.error('Error counting posts:', error);
+    return 0;
+  }
+};

@@ -1,13 +1,18 @@
 import React, { useCallback, useState } from 'react';
-import { View, Text, Image, StyleSheet, ActivityIndicator, ScrollView, Button } from 'react-native';
+import { View, Text, Image, StyleSheet, ActivityIndicator, ScrollView, Button, TouchableOpacity } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
 import { getUserById } from '../db-service/userService';
 import { getDBConnection } from '../db-service/database';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { countFollowers, countFollowing } from '../db-service/followerService';
+import { countPosts } from '../db-service/postService';
+import { useFocusEffect } from '@react-navigation/native';
 
 const ProfileScreen = ({ navigation }: any) => {
   const { user, loading } = useAuth();
   const [userDetails, setUserDetails] = useState<any>(null);
+  const [followerCount, setFollowerCount] = useState(0);
+  const [followingCount, setFollowingCount] = useState(0);
+  const [postCount, setPostCount] = useState(0);
 
   useFocusEffect(
     useCallback(() => {
@@ -17,6 +22,15 @@ const ProfileScreen = ({ navigation }: any) => {
             const db = await getDBConnection();
             const userData = await getUserById(db, user.id);
             setUserDetails(userData);
+
+            const [followers, following, posts] = await Promise.all([
+              countFollowers(db, user.id),
+              countFollowing(db, user.id),
+              countPosts(db, user.id),
+            ]);
+            setFollowerCount(followers);
+            setFollowingCount(following);
+            setPostCount(posts);
           } catch (error) {
             console.error('Failed to fetch user details:', error);
           }
@@ -40,19 +54,28 @@ const ProfileScreen = ({ navigation }: any) => {
         <Image style={styles.profileImage} source={{ uri: userDetails.image }} />
         <View style={styles.profileInfoContainer}>
           <Text style={styles.name}>{userDetails.name}</Text>
+
           <View style={styles.statsRow}>
             <View style={styles.statBox}>
-              <Text style={styles.statNumber}>120</Text>
+              <Text style={styles.statNumber}>{postCount}</Text>
               <Text style={styles.statLabel}>Posts</Text>
             </View>
-            <View style={styles.statBox}>
-              <Text style={styles.statNumber}>500</Text>
+
+            <TouchableOpacity
+              style={styles.statBox}
+              onPress={() => navigation.navigate('Followers', { searchedUser: user, viewMode: 'followers' })}
+            >
+              <Text style={styles.statNumber}>{followerCount}</Text>
               <Text style={styles.statLabel}>Followers</Text>
-            </View>
-            <View style={styles.statBox}>
-              <Text style={styles.statNumber}>180</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.statBox}
+              onPress={() => navigation.navigate('Followers', { searchedUser: user, viewMode: 'following' })}
+            >
+              <Text style={styles.statNumber}>{followingCount}</Text>
               <Text style={styles.statLabel}>Following</Text>
-            </View>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -83,7 +106,7 @@ const styles = StyleSheet.create({
   username: {
     fontSize: 18,
     color: '#666',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   profileRow: {
     flexDirection: 'row',
@@ -113,7 +136,7 @@ const styles = StyleSheet.create({
   },
   statBox: {
     alignItems: 'center',
-    marginHorizontal: 5,
+    marginHorizontal: 10,
   },
   statNumber: {
     fontSize: 16,
