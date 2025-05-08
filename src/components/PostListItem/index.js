@@ -2,19 +2,36 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Image, Dimensions, StyleSheet } from 'react-native';
 import { TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import moment from 'moment';
 import styles from '../../assets/styles/HomeScreen.style';
 
 const PostListItem = ({ post }) => {
   const navigation = useNavigation();
   const [imageDimensions, setImageDimensions] = useState(null);
+  const [timeAgo, setTimeAgo] = useState('');
   const screenWidth = Dimensions.get('window').width - 52;
   
-  // Format date to local string
-  const formatDate = (dateString) => new Date(dateString).toLocaleString();
+  // Get time ago text
+  const getTimeAgo = (dateString) => {
+    return moment(dateString).fromNow();
+  };
 
   // Removing width and height parameters from image url
   const cleanImageUrl = (url) =>
     url ? url.replace(/w_\d+/, '').replace(/h_\d+/, '') : null;
+
+  useEffect(() => {
+    // Set initial time ago
+    setTimeAgo(getTimeAgo(post.created_at));
+    
+    // Update time ago every 30 seconds
+    const intervalId = setInterval(() => {
+      setTimeAgo(getTimeAgo(post.created_at));
+    }, 30000); // 30 seconds
+    
+    // Clean up interval on unmount
+    return () => clearInterval(intervalId);
+  }, [post.created_at]);
 
   useEffect(() => {
     if (post.image) {
@@ -53,7 +70,7 @@ const PostListItem = ({ post }) => {
       <TouchableOpacity onPress={handleUserPress}>
         <Text style={styles.username}>Posted by: {post.user_name}</Text>
       </TouchableOpacity>
-      <Text style={styles.postInfo}>Created at: {formatDate(post.created_at)}</Text>
+      <Text style={styles.postInfo}>{timeAgo}</Text>
       
       {/* Post Image */}
       <View style={styles.imageContainer}>
