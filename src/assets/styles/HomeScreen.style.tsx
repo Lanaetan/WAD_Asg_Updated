@@ -1,11 +1,6 @@
 import {StyleSheet} from 'react-native';
 
 export default StyleSheet.create({
-  container: {
-    flex: 1,
-    width: '100%',
-    backgroundColor: '#f5f5f5',
-  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -21,6 +16,7 @@ export default StyleSheet.create({
     paddingVertical: 12,
     width: '100%',
   },
+  // Post item
   postCard: {
     backgroundColor: 'white',
     borderRadius: 8,
@@ -31,16 +27,24 @@ export default StyleSheet.create({
     borderColor: '#ccc',
     elevation: 2,
   },
+  // Header
   caption: {
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 8,
+    color: 'black',
   },
+  readMoreText: {
+    color: 'grey',
+    marginTop: 4,
+    fontSize: 14,
+  },  
   postInfo: {
     fontSize: 14,
     color: '#666',
     marginBottom: 4,
   },
+  // Image
   imageContainer: {
     marginTop: 12,
     width: '100%',
@@ -50,11 +54,46 @@ export default StyleSheet.create({
   },
   postImage: {
     width: '100%',
-    // Height will be dynamically calculated based on the image's aspect ratio
   },
   noImageText: {
     textAlign: 'center',
     padding: 20,
     color: '#999',
   },
+  // Footer
+  footer: {
+    marginTop: 5,
+  },
+  timeInfo: {
+    fontSize: 14,
+    color: '#666',
+  },
+  // Post Buttons
+  ButtonTab: {
+    flexDirection: 'row',
+    marginTop: 5,
+    marginBottom: 10,
+  },
+  button: {
+    fontSize: 28,
+    marginRight: 8,
+  },
+  count: {
+    marginLeft: 4
+  },
+  // User info
+  userInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  userRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  username: {
+    fontSize: 14,
+    color: '#333',
+    fontWeight: '500',
+  },  
 });

@@ -1,115 +1,210 @@
 import React, { useCallback, useEffect, useState } from "react";
-import {Text, View, Image, StyleSheet} from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  ActivityIndicator,
+} from "react-native";
 import { getDBConnection } from "../db-service/database";
-import { countFollowers, countFollowing, createFollower, deleteFollower, isUserFollowing } from "../db-service/followerService";
+import {
+  countFollowers,
+  countFollowing,
+  createFollower,
+  deleteFollower,
+  isUserFollowing,
+} from "../db-service/followerService";
 import { useAuth } from "../contexts/AuthContext";
 
-const UserProfileScreen = ({route, navigation}: any) => {
-    const { user } = useAuth();
-    const searchedUser = route.params.searchedUser;
-    const [isFollowing, setIsFollowing] = React.useState(false);
-    const [followerCount, setFollowerCount] = useState(0);
-    const [followingCount, setFollowingCount] = useState(0);
-    
+const UserProfileScreen = ({ route, navigation }: any) => {
+  const { user } = useAuth();
+  const searchedUser = route.params.searchedUser;
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followerCount, setFollowerCount] = useState(0);
+  const [followingCount, setFollowingCount] = useState(0);
+  const [loading, setLoading] = useState(true);
 
-    const fetchData = async () => {
-      try {
-        const db = await getDBConnection();
-  
-        const [followStatus, followers, following] = await Promise.all([
-          isUserFollowing(db, searchedUser.id, user.id),   // user is checking if they follow searchedUser
-          countFollowers(db, searchedUser.id),
-          countFollowing(db, searchedUser.id),
-        ]);
-    
-        setIsFollowing(followStatus);
-        setFollowerCount(followers);
-        setFollowingCount(following);
-      } catch (error) {
-        console.error("Error in fetching user data", error);
+  const fetchData = async () => {
+    try {
+      const db = await getDBConnection();
+      const [followStatus, followers, following] = await Promise.all([
+        isUserFollowing(db, searchedUser.id, user.id),
+        countFollowers(db, searchedUser.id),
+        countFollowing(db, searchedUser.id),
+      ]);
+
+      setIsFollowing(followStatus);
+      setFollowerCount(followers);
+      setFollowingCount(following);
+    } catch (error) {
+      console.error("Error fetching user data", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFollowToggle = useCallback(async () => {
+    try {
+      const db = await getDBConnection();
+      if (isFollowing) {
+        await deleteFollower(db, searchedUser.id, user.id);
+      } else {
+        await createFollower(db, searchedUser.id, user.id);
       }
-    };
+      setIsFollowing(!isFollowing);
+      await fetchData(); // Refresh data after action
+    } catch (error) {
+      console.error("Follow/Unfollow failed", error);
+    }
+  }, [isFollowing, user.id, searchedUser.id]);
 
-    const handleFollowToggle = useCallback(async () => {
-      try {
-        const db = await getDBConnection();
-        if (isFollowing) {
-          await deleteFollower(db, searchedUser.id, user.id);
-        } else {
-          await createFollower(db, searchedUser.id, user.id);
-        }
-        setIsFollowing(!isFollowing);
-        await fetchData(); // re-fetch updated counts and status
-      } catch (error) {
-        console.error("Follow/Unfollow failed", error);
-      }
-    }, [isFollowing, user.id, searchedUser.id]);
-
-    useEffect(() => {
-      fetchData();
+  useEffect(() => {
+    fetchData();
   }, [searchedUser.id]);
-    
-    return(
-        <View style={{flex:1, justifyContent:'center', alignItems:'center'}}>
-            <Image
-                source={{ uri: searchedUser.image }}
-                style={styles.profileImage}
-                resizeMode="cover" 
-            />
-            <Text>{searchedUser.username}</Text>
-            <Text>{searchedUser.bio}</Text>
-            <View style={{flexDirection: 'row'}}>
-              <TouchableOpacity 
-                style={styles.follow}
-                onPress={() => {
-                  navigation.navigate("Followers", { searchedUser: searchedUser, viewMode: 'followers' });
-              }}
-              >
-                <Text>{followerCount}</Text>
-                <Text>Followers</Text>
-              </TouchableOpacity>
 
-              <TouchableOpacity 
-                style={styles.follow}
-                onPress={() => {
-                  navigation.navigate("Followers", { searchedUser: searchedUser, viewMode: 'following' });
-              }}
-              >
-                <Text>{followingCount}</Text>
-                <Text>Following</Text>
-              </TouchableOpacity>
-            </View>
+  if (loading) {
+    return <ActivityIndicator size="large" color="#0095f6" style={styles.loader} />;
+  }
 
-            {searchedUser.id === user.id ? null : (
-              <TouchableOpacity
-                onPress={handleFollowToggle}
-                style={{
-                  backgroundColor: isFollowing ? 'white' : 'skyblue',
-                  padding: 10,
-                  borderRadius: 5,
-                  alignItems: 'center',
-                }}
-              >
-                <Text style={{ color: isFollowing ? 'skyblue' : 'white' }}>
-                  {isFollowing ? 'Unfollow' : 'Follow'}
-                </Text>
-              </TouchableOpacity>
-            )}
+  return (
+    <ScrollView style={styles.container}>
+      <View style={styles.usernameContainer}>
+        <Text style={styles.username}>@{searchedUser.username}</Text>
+      </View>
+
+      <View style={styles.profileRow}>
+        <Image style={styles.profileImage} source={{ uri: searchedUser.image }} />
+        <View style={styles.profileInfoContainer}>
+          <Text style={styles.name}>{searchedUser.name || searchedUser.username}</Text>
+
+          <View style={styles.statsRow}>
+            <TouchableOpacity
+              style={styles.statBox}
+              onPress={() =>
+                navigation.navigate("Followers", {
+                  searchedUser,
+                  viewMode: "followers",
+                })
+              }
+            >
+              <Text style={styles.statNumber}>{followerCount}</Text>
+              <Text style={styles.statLabel}>Followers</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.statBox}
+              onPress={() =>
+                navigation.navigate("Followers", {
+                  searchedUser,
+                  viewMode: "following",
+                })
+              }
+            >
+              <Text style={styles.statNumber}>{followingCount}</Text>
+              <Text style={styles.statLabel}>Following</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-    )
-}
+      </View>
+
+      <View style={styles.bioContainer}>
+        <Text style={styles.bio}>{searchedUser.bio}</Text>
+      </View>
+
+      {searchedUser.id !== user.id && (
+        <View style={styles.followButtonContainer}>
+          <TouchableOpacity
+            onPress={handleFollowToggle}
+            style={[
+              styles.followButton,
+              { backgroundColor: isFollowing ? "white" : "#0095f6", borderWidth: 1, borderColor: "#0095f6" },
+            ]}
+          >
+            <Text style={{ color: isFollowing ? "#0095f6" : "white" }}>
+              {isFollowing ? "Unfollow" : "Follow"}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
+    </ScrollView>
+  );
+};
 
 export default UserProfileScreen;
 
 const styles = StyleSheet.create({
-    profileImage: {
-      width: 200,  
-      height: 200, 
-      borderRadius: 200,
-      marginBottom: 10,
-    },
-    follow: {
-      padding: 10,
-    }
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    padding: 20,
+    
+  },
+  usernameContainer: {
+   
+    marginBottom: 10,
+  },
+  username: {
+    fontSize: 18,
+    color: "#666",
+    fontWeight: "bold",
+  },
+  profileRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  profileImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 50,
+    borderWidth: 2,
+    borderColor: "#ddd",
+    marginRight: 15,
+  },
+  profileInfoContainer: {
+    flex: 1,
+    justifyContent: "center",
+  },
+  name: {
+    fontSize: 15,
+    fontWeight: "bold",
+    marginBottom: 8,
+  },
+  statsRow: {
+    flexDirection: "row",
+    justifyContent: "center", // Center both stat boxes
+  },
+  statBox: {
+    alignItems: "center",
+    marginHorizontal: 20, // Space between boxes
+  },
+  statNumber: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  statLabel: {
+    fontSize: 13,
+    color: "#999",
+  },
+  bioContainer: {
+    marginVertical: 10,
+  },
+  bio: {
+    fontSize: 16,
+    color: "#666",
+  },
+  followButtonContainer: {
+    alignItems: "center",
+    marginVertical: 10,
+  },
+  followButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 30,
+    borderRadius: 5,
+  },
+  loader: {
+    marginTop: 50,
+  },
 });

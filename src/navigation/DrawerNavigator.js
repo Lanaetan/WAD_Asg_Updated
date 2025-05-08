@@ -22,13 +22,19 @@ import { getUsersExceptCurrent } from '../db-service/userService';
 import { getDBConnection } from "../db-service/database";
 import { createMessage } from "../db-service/messageService";
 import SettingsScreen from '../screens/SettingsScreen';
+import WelcomeScreen from "../screens/WelcomeScreen"; 
+
 const Drawer = createDrawerNavigator();
 
 const MyDrawerComponent = (props) => {
   const { user, logout } = useContext(AuthContext);
 
-  const handleLogout = async () => {
-    await logout();
+  const handleLogout = async (navigation) => {
+    await logout();  // Perform logout logic
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'Welcome' }],  // Reset to Welcome screen after logout
+    });
   };
 
   useEffect(() => {
@@ -55,7 +61,7 @@ const MyDrawerComponent = (props) => {
     return () => {
       socket.off('message_broadcast', handleMessage);
     };
-  },[])
+  },[]);
 
   return (
     <View style={{ flex: 1 }}>
@@ -98,17 +104,17 @@ const MyDrawerComponent = (props) => {
             {user?.username || "Username"}
           </Text>
 
-            <Text
-              style={{
-                color: "#fff",
-                fontFamily: "Anta-Regular",
-                fontSize: 12,
-                alignSelf: "flex-end",
-                marginLeft: 10,
-              }}
-            >
-              {user?.name}
-            </Text>
+          <Text
+            style={{
+              color: "#fff",
+              fontFamily: "Anta-Regular",
+              fontSize: 12,
+              alignSelf: "flex-end",
+              marginLeft: 10,
+            }}
+          >
+            {user?.name || "Default Name"} {/* Added fallback to prevent error */}
+          </Text>
         </ImageBackground>
 
         <View style={{ backgroundColor: "#fff", flex: 1, paddingTop: 10 }}>
@@ -116,22 +122,23 @@ const MyDrawerComponent = (props) => {
         </View>
       </DrawerContentScrollView>
 
-      <View style={{ padding: 15, borderTopWidth: 1, borderTopColor: "grey" }}>
-        <TouchableOpacity style={{ paddingVertical: 10 }} onPress={handleLogout}>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Ionicons name="exit-outline" size={20} />
-            <Text
-              style={{
-                marginLeft: 10,
-                fontSize: 15,
-                fontFamily: "Anta-Regular",
-              }}
-            >
-              Sign Out
-            </Text>
-          </View>
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity
+        style={{ paddingVertical: 10 }}
+        onPress={() => handleLogout(props.navigation)}  // Pass navigation here
+      >
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Ionicons name="exit-outline" size={20} />
+          <Text
+            style={{
+              marginLeft: 10,
+              fontSize: 15,
+              fontFamily: "Anta-Regular",
+            }}
+          >
+            Sign Out
+          </Text>
+        </View>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -143,11 +150,11 @@ const DrawerNavigator = () => {
   const _query = async () => {
     try {
       setUsers(await getUsersExceptCurrent(await getDBConnection(), user?.id));
-    }catch (error) {
+    } catch (error) {
       console.error(error);
       throw Error('Failed to get users except current logged in user !!!');
     }
-  }
+  };
 
   useEffect(() => {
     if (user?.id) {
@@ -167,25 +174,25 @@ const DrawerNavigator = () => {
         },
       }}
     >
-    <Drawer.Screen
-      name="MainTabs"
-      component={BottomTabNavigator}
-      options={({ navigation }) => ({
-        title: "For you",
-        drawerIcon: ({ color }) => (
-          <AntDesign name="smileo" size={24} color={color} />
-        ),
-        headerLeft: () => (
-          <Feather
-            name="menu"
-            size={21}
-            color="black"
-            style={{ marginLeft: 15 }}
-            onPress={() => navigation.openDrawer()}
-          />
-        ),
-      })}
-    />
+      <Drawer.Screen
+        name="MainTabs"
+        component={BottomTabNavigator}
+        options={({ navigation }) => ({
+          title: "For you",
+          drawerIcon: ({ color }) => (
+            <AntDesign name="smileo" size={24} color={color} />
+          ),
+          headerLeft: () => (
+            <Feather
+              name="menu"
+              size={21}
+              color="black"
+              style={{ marginLeft: 15 }}
+              onPress={() => navigation.openDrawer()}
+            />
+          ),
+        })}
+      />
 
       <Drawer.Screen
         name="Chats"
@@ -204,14 +211,14 @@ const DrawerNavigator = () => {
       </Drawer.Screen>
 
       <Drawer.Screen
-          name="Settings"
-          component={SettingsScreen}
-          options={{
-            drawerIcon: ({ color }) => (
-              <Ionicons name="settings-outline" size={24} color={color} />
-            ),
-          }}
-        />
+        name="Settings"
+        component={SettingsScreen}
+        options={{
+          drawerIcon: ({ color }) => (
+            <Ionicons name="settings-outline" size={24} color={color} />
+          ),
+        }}
+      />
 
     </Drawer.Navigator>
   );
