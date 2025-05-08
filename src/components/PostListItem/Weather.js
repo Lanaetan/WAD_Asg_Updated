@@ -23,6 +23,7 @@ const WeatherApp = () => {
         }
       );
       setWeather(response.data);
+      console.info("Weather fetched!");
     } catch (err) {
       setError('Error fetching weather data');
     } finally {
