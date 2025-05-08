@@ -124,7 +124,7 @@ const MyDrawerComponent = (props) => {
 
       <TouchableOpacity
         style={{ paddingVertical: 10 }}
-        onPress={() => handleLogout(props.navigation)}  // Pass navigation here
+        onPress={() => handleLogout(props.navigation)}  // Pass navigation here 
       >
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <Ionicons name="exit-outline" size={20} />
