@@ -1,84 +1,130 @@
-import React, {useState} from 'react';
-import {TextInput, Alert, Modal, Pressable, View, TouchableOpacity, Text, TouchableWithoutFeedback} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {
+  Modal,
+  View,
+  TouchableOpacity,
+  Text,
+  TextInput,
+  TouchableWithoutFeedback,
+  Alert,
+  ScrollView,
+} from 'react-native';
 import {SafeAreaView, SafeAreaProvider} from 'react-native-safe-area-context';
-
 import Ionicons from 'react-native-vector-icons/Ionicons';
+
+import moment from 'moment';
+
 import styles from '../../assets/styles/HomeScreen.style';
 import stylesCommentModal from '../../assets/styles/CommentModal.style';
 
-const Button = () => {
-  const [modalVisible, setModalVisible] = useState(false);
+import {
+  createComment,
+  getCommentsByPost,
+} from '../../db-service/commentService';
 
-  // Close modal when tapping outside of modal content
-  const handleBackgroundPress = () => {
-    setModalVisible(false);
+import {getDBConnection} from '../../db-service/database';
+
+const CommentButton = ({postId, userId}) => {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [commentText, setCommentText] = useState('');
+  const [comments, setComments] = useState([]);
+
+  // Fetch comments when the modal opens
+  const fetchComments = async () => {
+    try {
+      const db = await getDBConnection();
+      const postComments = await getCommentsByPost(db, postId); // Assuming this function exists
+      setComments(postComments);
+    } catch (err) {
+      console.error(err);
+      Alert.alert('Error', 'Failed to load comments.');
+    }
   };
 
-  // Prevent taps on modal content from closing the modal
-  const handleModalPress = (e) => {
-    e.stopPropagation();
+  // Open modal and fetch comments
+  const openModal = () => {
+    setModalVisible(true);
+    fetchComments();
+  };
+
+  const handleBackgroundPress = () => setModalVisible(false);
+  const handleModalPress = e => e.stopPropagation();
+
+  const handlePostComment = async () => {
+    if (commentText.trim() === '') {
+      Alert.alert('Empty Comment', 'Please write something.');
+      return;
+    }
+
+    try {
+      const db = await getDBConnection();
+      const createdAt = new Date().toISOString();
+      await createComment(db, commentText, createdAt, postId, userId);
+
+      setCommentText('');
+      setModalVisible(false);
+      fetchComments(); // Reload comments after posting a new one
+      Alert.alert('Success', 'Comment posted!');
+    } catch (err) {
+      console.error(err);
+      Alert.alert('Error', 'Failed to post comment.');
+    }
   };
 
   return (
     <View>
-      {/* Comment Modal */}
       <Modal
-        animationType="slide" 
+        animationType="slide"
         transparent={true}
         visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(false);
-        }}>
+        onRequestClose={() => setModalVisible(false)}>
         <SafeAreaProvider>
           <TouchableWithoutFeedback onPress={handleBackgroundPress}>
             <SafeAreaView style={stylesCommentModal.centeredView}>
-              {/* Dimmed background overlay */}
               <View style={stylesCommentModal.overlay} />
-              
-              {/* Modal content - TouchableWithoutFeedback stops propagation */}
               <TouchableWithoutFeedback onPress={handleModalPress}>
                 <View style={stylesCommentModal.modalView}>
-                  <Text style={stylesCommentModal.modalText}>
-                    Hello World!
-                    Hello World!
-                    Hello World!
-                    Hello World!Hello World!
-                    Hello World!Hello World!
-                    Hello World!Hello World!
-                    Hello World!Hello World!
-                    Hello World!Hello World!
-                    Hello World!Hello World!
-                    Hello World!Hello World!
-                    Hello World!Hello World!
-                    Hello World!Hello World!
-                    Hello World!Hello World!
-                    Hello World!Hello World!
-                    Hello World!Hello World!
-                    Hello World!Hello World!
-                    Hello World!Hello World!
-                    Hello World!Hello World!
-                    Hello World!Hello World!
-                    Hello World!Hello World!
-                    Hello World!Hello World!
-                    Hello World!Hello World!
-                    Hello World!Hello World!
-                    Hello World!Hello World!
-                    Hello World!Hello World!
-                    Hello World!Hello World!
-                    Hello World!Hello World!
-                    Hello World!Hello World!
-                    Hello World!Hello World!
-                    Hello World!Hello World!
-                    Hello World!Hello World!
-                    Hello World!Hello World!
-                    Hello World!Hello World!
-                    Hello World!
-                  </Text>
+                  {/* Display Comments */}
+                  <ScrollView style={stylesCommentModal.commentList}>
+                    {comments.length === 0 ? (
+                      <Text style={stylesCommentModal.noCommentsText}>
+                        No comments yet
+                      </Text>
+                    ) : (
+                      comments.map((comment, index) => (
+                        <View
+                          key={index}
+                          style={stylesCommentModal.commentItem}>
+                          {/* Name and Created At */}
+                          <Text style={stylesCommentModal.commentUserName}>
+                            {comment.user_name} •{' '}
+                            {moment(comment.created_at).fromNow()}
+                          </Text>
+
+                          {/* Text */}
+                          <Text style={stylesCommentModal.commentText}>
+                            {comment.text}
+                          </Text>
+                        </View>
+                      ))
+                    )}
+                  </ScrollView>
+
+                  {/* Text Input for new comment */}
                   <TextInput
-                    placeholder="Enter your caption..."
-                  >
-                    
-                  </TextInput>
+                    style={stylesCommentModal.textInput}
+                    placeholder="Enter your comment..."
+                    value={commentText}
+                    onChangeText={setCommentText}
+                    multiline
+                  />
+                  <TouchableOpacity
+                    style={stylesCommentModal.submitButton}
+                    onPress={handlePostComment}>
+                    <Text style={stylesCommentModal.submitButtonText}>
+                      Post
+                    </Text>
+                  </TouchableOpacity>
                 </View>
               </TouchableWithoutFeedback>
             </SafeAreaView>
@@ -86,11 +132,11 @@ const Button = () => {
         </SafeAreaProvider>
       </Modal>
 
-      {/* Button to open comment modal */}
-      <TouchableOpacity onPress={() => setModalVisible(true)}>
+      <TouchableOpacity onPress={openModal}>
         <Ionicons
           style={styles.button}
-          name={'chatbubbles-outline'}
+          name="chatbubbles-outline"
+          size={24}
           color="black"
         />
       </TouchableOpacity>
@@ -98,4 +144,4 @@ const Button = () => {
   );
 };
 
-export default Button;
+export default CommentButton;

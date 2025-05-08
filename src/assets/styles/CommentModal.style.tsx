@@ -1,4 +1,4 @@
-import {StyleSheet} from 'react-native';
+import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
   centeredView: {
@@ -29,7 +29,7 @@ export default StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
     width: '100%',
-    minHeight: 400,
+    minHeight: 200,
     maxWidth: 700,
     zIndex: 10, // Ensure it's above the overlay
   },
@@ -41,5 +41,56 @@ export default StyleSheet.create({
   modalText: {
     marginBottom: 15,
     textAlign: 'center',
+  },
+  // Comment display section
+  commentList: {
+    width: '100%',
+    maxHeight: 200, // Limit height for better scrollability
+    marginBottom: 15,
+  },
+  noCommentsText: {
+    textAlign: 'center',
+    color: '#999',
+    fontStyle: 'italic',
+  },
+  commentItem: {
+    marginBottom: 15,
+  },
+  commentUserName: {
+    fontWeight: '300',
+    marginBottom: 4,
+    color: '#333',
+  },  
+  commentText: {
+    fontSize: 14,
+    color: '#333',
+  },
+  commentDate: {
+    fontSize: 12,
+    color: '#999',
+    marginTop: 5,
+  },
+  // Comment input section
+  textInput: {
+    width: '100%',
+    height: 50,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 10,
+    backgroundColor: '#fff',
+  },
+  submitButton: {
+    backgroundColor: '#1e90ff',
+    padding: 12,
+    width: '100%',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  submitButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });

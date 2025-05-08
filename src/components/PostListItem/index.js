@@ -6,9 +6,11 @@ import moment from 'moment';
 import styles from '../../assets/styles/HomeScreen.style';
 import LikeButton from './LikeButton';
 import CommentButton from './CommentButton';
+import { useAuth } from '../../contexts/AuthContext';
 
 const PostListItem = ({post}) => {
   const navigation = useNavigation();
+  const { user } = useAuth(); // Retrieve the user from context
   const [imageDimensions, setImageDimensions] = useState(null);
   const [timeAgo, setTimeAgo] = useState('');
   const screenWidth = Dimensions.get('window').width - 52;
@@ -54,17 +56,6 @@ const PostListItem = ({post}) => {
     });
   };
 
-  // Like post when like button is pressed
-  const handleLikePress = () => {
-    console.log('Like pressed!');
-    name = !name;
-  };
-
-  // Show comment modal when comment button is pressed
-  const handleCommentPress = () => {
-    console.log('Comment pressed!');
-  };
-
   const imageUrl = cleanImageUrl(post.image);
 
   const imageStyle =
@@ -77,7 +68,6 @@ const PostListItem = ({post}) => {
       : {};
 
   return (
-    // Post item
     <View style={styles.postCard}>
       {/* Post Header */}
       <View style={styles.header}>
@@ -91,7 +81,7 @@ const PostListItem = ({post}) => {
         </View>
       </View>
 
-      {/* Post Image Container*/}
+      {/* Post Image Container */}
       <View style={styles.imageContainer}>
         {imageUrl ? (
           <Image
@@ -110,8 +100,8 @@ const PostListItem = ({post}) => {
       {/* Post Footer */}
       <View style={styles.footer}>
         <View style={styles.ButtonTab}>
-          <LikeButton onPress={handleLikePress}></LikeButton>
-          <CommentButton onPress={handleCommentPress}></CommentButton>
+          <LikeButton></LikeButton>
+          {user && <CommentButton postId={post.id} userId={user.id} />}
         </View>
         <Text style={styles.timeInfo}>{timeAgo}</Text>
       </View>
