@@ -8,6 +8,7 @@ import {
   TouchableWithoutFeedback,
   Alert,
   ScrollView,
+  RefreshControl,
 } from 'react-native';
 import {SafeAreaView, SafeAreaProvider} from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -104,7 +105,19 @@ const CommentButton = ({postId, userId}) => {
               <TouchableWithoutFeedback onPress={handleModalPress}>
                 <View style={stylesCommentModal.modalView}>
                   {/* Display Comments */}
-                  <ScrollView style={stylesCommentModal.commentList}>
+                  <ScrollView
+                    style={stylesCommentModal.commentList}
+                    onScroll={({nativeEvent}) => {
+                      if (nativeEvent.contentOffset.y <= -30) {
+                        setModalVisible(false);
+                      }
+                    }}
+                    scrollEventThrottle={16}
+                    bounces={true}
+                    contentInsetAdjustmentBehavior="automatic"
+                    refreshControl={
+                      <RefreshControl refreshing={false} onRefresh={() => {}} />
+                    }>
                     {comments.length === 0 ? (
                       <Text style={stylesCommentModal.noCommentsText}>
                         No comments yet
