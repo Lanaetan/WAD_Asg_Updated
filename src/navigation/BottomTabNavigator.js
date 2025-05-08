@@ -9,7 +9,9 @@ import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import CreatePostScreen from '../screens/CreatePostScreen';
 import TestDbScreen from '../screens/TestDbScreen';
-import TestChatScreen from '../screens/TestChatScreen';
+import SearchScreen from '../screens/SearchScreen';
+import TestCreateFollower from "../screens/TestCreateFollower";
+import TestGetFollower from "../screens/TestGetFollower";
 
 const Tab = createBottomTabNavigator();
 
@@ -30,6 +32,19 @@ const BottomTabNavigator = () => {
         headerShown: false, // 👈 hide tab headers, drawer will handle headers
       }}
     >
+      <Tab.Screen
+        name="Search"
+        component={SearchScreen}
+        options={{
+          headerTitle: 'Search',
+          headerTitleStyle: {
+            // fontFamily: "PTSans-Bold",
+          },
+          tabBarIcon: ({ color }) => {
+            return <Feather name="search" size={24} color={ color } />;
+          },
+        }}
+      />
       <Tab.Screen
         name="Home"
         component={HomeScreen}
@@ -89,7 +104,20 @@ const BottomTabNavigator = () => {
       />
       <Tab.Screen
         name="TestChat"
-        component={TestChatScreen}
+        component={TestCreateFollower}
+         options={{
+          headerTitle: 'Login',
+          headerTitleStyle: {
+            // fontFamily: "PTSans-Bold",
+          },
+          tabBarIcon: ({ color }) => {
+            return <Feather name="user" size={24} color={ color } />;
+          },
+        }}
+      />
+      <Tab.Screen
+        name="TestGetFollower"
+        component={TestGetFollower}
          options={{
           headerTitle: 'Login',
           headerTitleStyle: {

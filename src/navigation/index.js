@@ -10,10 +10,12 @@ import ChatScreen from '../screens/ChatScreen';
 import ContactsScreen from '../screens/ContactsScreen';
 import SignIn from '../screens/SignIn';
 import SignUp from '../screens/SignUp';
+import UserProfileScreen from '../screens/UserProfileScreen';
+import FollowersScreen from '../screens/FollowersScreen';
 import DrawerNavigator from './DrawerNavigator';
+import BottomTabNavigator from './BottomTabNavigator';
 import EditProfileScreen from '../screens/EditProfile';
 import WelcomeScreen from '../screens/WelcomeScreen';
-
 
 
 // Ignore specific warning logs
@@ -86,6 +88,9 @@ const Navigator = () => {
                 component={DrawerNavigator}
                 options={{ headerShown: false }}
               />
+              <Stack.Screen name="BottomTabs" component={BottomTabNavigator} />
+              <Stack.Screen name="UserProfile" component={UserProfileScreen} />
+              <Stack.Screen name="Followers" component={FollowersScreen} />
               <Stack.Screen name="Chat" component={ChatScreen} />
               <Stack.Screen name="Contacts" component={ContactsScreen} />
               <Stack.Screen name="EditProfile" component={EditProfileScreen} />
@@ -104,6 +109,7 @@ const Navigator = () => {
         </Stack.Navigator>
       </NavigationContainer>
     );    
+
 };
 
 export default Navigator;

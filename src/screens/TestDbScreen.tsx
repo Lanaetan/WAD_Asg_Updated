@@ -3,7 +3,6 @@ import { View, Text, Button, FlatList, StyleSheet } from 'react-native';
 import { getUsersExceptCurrent } from '../db-service/userService';
 import { getDBConnection } from '../db-service/database';
 import { getMessagesBetween } from '../db-service/messageService';
-let SQLite = require('react-native-sqlite-storage');
 
 const openCallback = () => {
     console.log('database open success');

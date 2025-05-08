@@ -26,7 +26,7 @@ db.execute('''CREATE TABLE IF NOT EXISTS users (
     username TEXT NOT NULL,
     password TEXT NOT NULL,
     email TEXT NOT NULL,
-    image TEXT NOT NULL,
+    image TEXT DEFAULT 'https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg',
     bio TEXT NOT NULL
 )''')
 
