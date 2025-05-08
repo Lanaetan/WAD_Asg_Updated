@@ -11,14 +11,12 @@ import {
   DrawerContentScrollView,
   DrawerItemList,
 } from "@react-navigation/drawer";
-import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Feather from "react-native-vector-icons/Feather";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import socket from "../utils/socket";
 
 import ChatsScreen from "../screens/ChatsScreen";
-import NotificationScreen from "../screens/NotificationScreen";
 import BottomTabNavigator from "./BottomTabNavigator";
 
 import { AuthContext } from "../contexts/AuthContext";
@@ -192,7 +190,7 @@ const DrawerNavigator = () => {
       name="MainTabs"
       component={BottomTabNavigator}
       options={({ navigation }) => ({
-        title: "For you", // Set static title
+        title: "For you",
         drawerIcon: ({ color }) => (
           <AntDesign name="smileo" size={24} color={color} />
         ),
@@ -207,16 +205,6 @@ const DrawerNavigator = () => {
         ),
       })}
     />
-
-      <Drawer.Screen
-        name="Notification"
-        component={NotificationScreen}
-        options={{
-          drawerIcon: ({ color }) => (
-            <Ionicons name="notifications-outline" size={24} color={color} />
-          ),
-        }}
-      />
 
       <Drawer.Screen
         name="Chats"
