@@ -16,7 +16,6 @@ import BottomTabNavigator from './BottomTabNavigator';
 import EditProfileScreen from '../screens/EditProfile';
 import WelcomeScreen from '../screens/WelcomeScreen';
 
-
 // Ignore specific warning logs
 LogBox.ignoreLogs(['EventEmitter.removeListener']);
 
