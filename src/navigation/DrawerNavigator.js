@@ -103,7 +103,7 @@ const MyDrawerComponent = (props) => {
           >
             {user?.username || "Username"}
           </Text>
-
+            
           <Text
             style={{
               color: "#fff",
@@ -122,23 +122,25 @@ const MyDrawerComponent = (props) => {
         </View>
       </DrawerContentScrollView>
 
-      <TouchableOpacity
-        style={{ paddingVertical: 10 }}
-        onPress={() => handleLogout(props.navigation)}  // Pass navigation here 
-      >
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Ionicons name="exit-outline" size={20} />
-          <Text
-            style={{
-              marginLeft: 10,
-              fontSize: 15,
-              fontFamily: "Anta-Regular",
-            }}
-          >
-            Sign Out
-          </Text>
-        </View>
-      </TouchableOpacity>
+      <View style={{padding: 15, borderTopWidth: 1, borderTopColor: 'grey'}}>
+        <TouchableOpacity
+          style={{ paddingVertical: 10 }}
+          onPress={() => handleLogout(props.navigation)}  // Pass navigation here
+        >
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Ionicons name="exit-outline" size={20} />
+            <Text
+              style={{
+                marginLeft: 10,
+                fontSize: 15,
+                fontFamily: "Anta-Regular",
+              }}
+            >
+              Sign Out
+            </Text>
+          </View>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
