@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useCreatePost } from '../contexts/Post/CreatePostContext';
-import styles from '../assets/styles/createPost.style';
+import styles from '../assets/styles/CreatePost.style';
 
 const CreateScreen = () => {
   const {
