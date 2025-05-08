@@ -30,7 +30,6 @@ const Drawer = createDrawerNavigator();
 
 const MyDrawerComponent = (props) => {
   const { user, logout } = useContext(AuthContext);
-  const [newMessageFlag, setNewMessageFlag] = useState(false);
 
   const handleLogout = async () => {
     await logout();
@@ -39,14 +38,8 @@ const MyDrawerComponent = (props) => {
   useEffect(() => {
     const handleMessage = async (data) => {
       const messageBag = JSON.parse(data);
-      console.log('what is inside messageBag? ', messageBag);
       const isoTimestamp = new Date(messageBag.created_at).toISOString();
   
-      // 💡 Optimistic update via an event or context
-      if (typeof props.onNewMessage === 'function') {
-        props.onNewMessage(messageBag);
-      }
-
       try {
         await createMessage(
           await getDBConnection(),
@@ -54,11 +47,7 @@ const MyDrawerComponent = (props) => {
           messageBag.sender_id,
           messageBag.message,
           isoTimestamp
-        );
-
-        // // Inside handleMessage, after createMessage:
-        // setNewMessageFlag(prev => !prev);
-        
+        );        
       } catch (error) {
         console.error(error);
         Alert.alert("Error", "Failed to save message");
@@ -83,7 +72,9 @@ const MyDrawerComponent = (props) => {
             uri:
               user?.image || "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg",
           }}
-          style={{ padding: 10 }}
+          style={{ 
+            padding: 10,
+          }}
         >
           <Image
             style={{
@@ -105,43 +96,26 @@ const MyDrawerComponent = (props) => {
               fontSize: 20,
               alignSelf: "flex-end",
               marginLeft: 20,
+              fontWeight: "bold",
             }}
           >
             {user?.username || "Username"}
           </Text>
 
-          <View style={{ flexDirection: "row", alignSelf: "flex-end" }}>
             <Text
               style={{
                 color: "#fff",
                 fontFamily: "Anta-Regular",
                 fontSize: 12,
+                alignSelf: "flex-end",
                 marginLeft: 10,
               }}
             >
-              129 Likes
+              {user.name}
             </Text>
-            <Ionicons
-              name="thumbs-up"
-              color="yellow"
-              style={{ marginLeft: 2, top: 2 }}
-            />
-            <Text
-              style={{
-                color: "#fff",
-                fontFamily: "Anta-Regular",
-                fontSize: 12,
-                marginLeft: 10,
-              }}
-            >
-              88 Followers
-            </Text>
-            <Ionicons
-              name="people"
-              color="yellow"
-              style={{ marginLeft: 2, top: 2 }}
-            />
-          </View>
+
+            
+            
         </ImageBackground>
 
         <View style={{ backgroundColor: "#fff", flex: 1, paddingTop: 10 }}>
@@ -214,44 +188,25 @@ const DrawerNavigator = () => {
         },
       }}
     >
-      <Drawer.Screen
-        name="MainTabs"
-        component={BottomTabNavigator}
-        options={({ navigation, route }) => {
-          const routeName = getFocusedRouteNameFromRoute(route) ?? "Home";
-
-          let title;
-          switch (routeName) {
-            case "Home":
-              title = "For you";
-              break;
-            case "CreatePosts":
-              title = "New Post";
-              break;
-            case "Profile":
-              title = "My Profile";
-              break;
-            default:
-              title = "App";
-          }
-
-          return {
-            title,
-            drawerIcon: ({ color }) => (
-              <AntDesign name="smileo" size={24} color={color} />
-            ),
-            headerLeft: () => (
-              <Feather
-                name="menu"
-                size={21}
-                color="black"
-                style={{ marginLeft: 15 }}
-                onPress={() => navigation.openDrawer()}
-              />
-            ),
-          };
-        }}
-      />
+    <Drawer.Screen
+      name="MainTabs"
+      component={BottomTabNavigator}
+      options={({ navigation }) => ({
+        title: "For you", // Set static title
+        drawerIcon: ({ color }) => (
+          <AntDesign name="smileo" size={24} color={color} />
+        ),
+        headerLeft: () => (
+          <Feather
+            name="menu"
+            size={21}
+            color="black"
+            style={{ marginLeft: 15 }}
+            onPress={() => navigation.openDrawer()}
+          />
+        ),
+      })}
+    />
 
       <Drawer.Screen
         name="Notification"

@@ -1,16 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Text, View, StyleSheet, TextInput, Image, Alert, SafeAreaView, TouchableOpacity, LogBox } from "react-native";
+import MessageList from "./MessageList";
 import Feather from "react-native-vector-icons/Feather";
 import LottieView from 'lottie-react-native';
-
 import { useAuth } from "../contexts/AuthContext";
-import { useSocket } from "../contexts/SocketContext";
-import socket from "../utils/socket";
-
-import MessageList from "./MessageList";
-
 import { getDBConnection } from "../db-service/database";
 import { createMessage, getMessagesBetween } from "../db-service/messageService";
+import socket from "../utils/socket";
 
 LogBox.ignoreLogs([
   'Non-serializable values were found in the navigation state',
@@ -62,8 +58,6 @@ const ChatScreen = ({route, navigation}: any) => {
   useEffect(() => {
     const loadNewMessage = async (data: any) => {
       const messageBag = JSON.parse(data);
-      console.log('Received from socket: ', messageBag);
-      console.log('userid', user?.id);
 
       // Only load message if it's intended for the current user
       if (
@@ -93,9 +87,6 @@ const ChatScreen = ({route, navigation}: any) => {
   },[user?.id]);
 
     const handleSendMessage = async () => {
-      console.log('handleSendMessage triggered'); // <-- confirm it is called
-      console.log('textRef:', textRef.current); // <-- check message content
-      console.log('socket:', socket); // <-- check if socket exists
 
       let message = textRef.current.trim();
 

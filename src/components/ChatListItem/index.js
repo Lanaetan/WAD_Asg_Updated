@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Text, View, Image, StyleSheet, Pressable } from 'react-native';
+import { Text, View, Image, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import dayjs from 'dayjs';
-import relativeTime from "dayjs/plugin/relativeTime";
 import { getLastMessage } from '../../db-service/messageService';
 import { getUserById } from "../../db-service/userService";
 import { getDBConnection } from "../../db-service/database";
-import socket from "../../utils/socket";
+import dayjs from 'dayjs';
+import relativeTime from "dayjs/plugin/relativeTime";
+import styles from "./styles";
 
 dayjs.extend(relativeTime);
 
@@ -47,7 +47,6 @@ const ChatListItem = ({ chat, currentUser, refresh }) => {
   }
   
   useEffect(() => {
-    
     const fetchData = async () => {
       try {
         const db = await getDBConnection();
@@ -91,45 +90,5 @@ const ChatListItem = ({ chat, currentUser, refresh }) => {
     </Pressable>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    marginHorizontal: 10,
-    marginVertical: 5,
-    height: 60,
-    alignItems: 'center',
-  },
-  image: {
-    width: 55,
-    height: 55,
-    borderRadius: 30,
-    marginRight: 10,
-  },
-  content: {
-    flex: 1,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBlockColor: 'lightgray',
-    padding: 5,
-  },
-  row: {
-    flexDirection: 'row',
-    marginBottom: 5,
-  },
-  name: {
-    flex: 1,
-    fontWeight: 'bold',
-    fontSize: 17,
-    fontFamily: "Anta-Regular",
-  },
-  subTitle: {
-    color: 'gray',
-    fontSize: 14,
-  },
-  createdAt: {
-    fontSize: 13,
-    marginRight: 5,
-  }
-})
 
 export default ChatListItem;

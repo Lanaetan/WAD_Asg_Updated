@@ -24,7 +24,7 @@ const HomeScreen = () => {
 
   const screenWidth = Dimensions.get('window').width - 52;
 
-  const renderItem = ({ item }) => {
+  const renderItem = ({ item }: any) => {
     const imageUrl = cleanImageUrl(item.image);
     const postDimensions = imageDimensions[item.id];
 

@@ -1,7 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TextInput, Image } from 'react-native';
-import { getUsersExceptCurrent } from '../db-service/messageService';
 import { getDBConnection } from '../db-service/database';
 import { useAuth } from '../contexts/AuthContext';
 import { TouchableOpacity } from 'react-native-gesture-handler';

@@ -55,7 +55,7 @@ const UserProfileScreen = ({route, navigation}: any) => {
             <Image
                 source={{ uri: searchedUser.image }}
                 style={styles.profileImage}
-                resizeMode="cover"  // You can also use 'contain' or 'stretch'
+                resizeMode="cover" 
             />
             <Text>{searchedUser.username}</Text>
             <Text>{searchedUser.bio}</Text>
@@ -104,9 +104,9 @@ export default UserProfileScreen;
 
 const styles = StyleSheet.create({
     profileImage: {
-      width: 200,  // Set a width for the image
-      height: 200, // Set a height for the image
-      borderRadius: 200, // Make the image round
+      width: 200,  
+      height: 200, 
+      borderRadius: 200,
       marginBottom: 10,
     },
     follow: {

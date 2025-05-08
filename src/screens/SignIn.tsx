@@ -1,8 +1,6 @@
 import { View, Text, StyleSheet, TouchableOpacity, Pressable, Alert } from 'react-native';
 import React, { useRef, useState } from 'react';
 import { TextInput } from 'react-native-gesture-handler';
-import SignUp from './SignUp';
-import Loading from '../components/Loading';
 import { useAuth } from '../contexts/AuthContext';
 
 const SignIn = ({route, navigation}: any) => {
@@ -17,14 +15,6 @@ const SignIn = ({route, navigation}: any) => {
       Alert.alert("Sign In", "Please fill in all fields");
       return;
     }
-
-    // setIsLoading(true);
-    // const response = await login(emailRef.current, passwordRef.current);
-    // setIsLoading(false);
-    // console.log("Sign in response: " + response);
-    // if(!response.success) {
-    //   Alert.alert("Sign In", response.message);
-    // }
 
     setIsLoading(true);
     const success = await login(emailRef.current, passwordRef.current);

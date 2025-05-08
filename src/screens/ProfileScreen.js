@@ -1,8 +1,8 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {Text, View, Image, StyleSheet} from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { getDBConnection } from "../db-service/database";
-import { countFollowers, countFollowing, createFollower, deleteFollower, isUserFollowing } from "../db-service/followerService";
+import { countFollowers, countFollowing } from "../db-service/followerService";
 import { useAuth } from "../contexts/AuthContext";
 
 const UserProfileScreen = ({route, navigation}) => {
@@ -10,7 +10,6 @@ const UserProfileScreen = ({route, navigation}) => {
     const [followerCount, setFollowerCount] = useState(0);
     const [followingCount, setFollowingCount] = useState(0);
     
-
     const fetchData = async () => {
       try {
         const db = await getDBConnection();
@@ -36,7 +35,7 @@ const UserProfileScreen = ({route, navigation}) => {
             <Image
                 source={{ uri: user.image }}
                 style={styles.profileImage}
-                resizeMode="cover"  // You can also use 'contain' or 'stretch'
+                resizeMode="cover" 
             />
             <Text>{user.username}</Text>
             <Text>{user.bio}</Text>
@@ -65,9 +64,9 @@ export default UserProfileScreen;
 
 const styles = StyleSheet.create({
     profileImage: {
-      width: 200,  // Set a width for the image
-      height: 200, // Set a height for the image
-      borderRadius: 200, // Make the image round
+      width: 200, 
+      height: 200,
+      borderRadius: 200,
       marginBottom: 10,
     },
     follow: {

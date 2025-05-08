@@ -6,7 +6,6 @@ const App = () => {
         <View style={{flex:1, justifyContent:'center', alignItems:'center'}}>
         <Text style={{ fontSize:50, color: 'black'}}>Notification</Text>
         </View>
-
     )
 }
 

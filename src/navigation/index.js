@@ -7,7 +7,6 @@ import socket from '../utils/socket';
 
 // Screens
 import ChatScreen from '../screens/ChatScreen';
-import ContactsScreen from '../screens/ContactsScreen';
 import SignIn from '../screens/SignIn';
 import SignUp from '../screens/SignUp';
 import UserProfileScreen from '../screens/UserProfileScreen';
@@ -44,28 +43,7 @@ const Navigator = () => {
       socket.on('disconnect', () => {
         console.log('Disconnected from socket server');
       });
-  
-      // const handleMessage = async (data) => {
-      //   const messageBag = JSON.parse(data);
-      //   console.log('what is inside messageBag? ', messageBag);
-    
-      //   try {
-      //     await createMessage(
-      //       await getDBConnection(),
-      //       messageBag.receiver_id,
-      //       messageBag.sender_id,
-      //       messageBag.message,
-      //       messageBag.created_at
-      //     );
-      //     // Optionally refresh your local message list here
-      //   } catch (error) {
-      //     console.error(error);
-      //     Alert.alert("Error", "Failed to save message");
-      //   }
-      // };
-    
-      // socket.on('message_broadcast', handleMessage);
-    
+      
       return () => {
         socket.disconnect();
       };
@@ -89,7 +67,6 @@ const Navigator = () => {
             <Stack.Screen name="UserProfile" component={UserProfileScreen} />
             <Stack.Screen name="Followers" component={FollowersScreen} />
             <Stack.Screen name="Chat" component={ChatScreen} />
-            <Stack.Screen name="Contacts" component={ContactsScreen} />
           </>
         ) : (
           <>

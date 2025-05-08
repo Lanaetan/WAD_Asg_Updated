@@ -1,10 +1,8 @@
 import React from "react";
 import { View } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
-
 import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import CreatePostScreen from '../screens/CreatePostScreen';
@@ -20,16 +18,15 @@ const BottomTabNavigator = () => {
     <Tab.Navigator
       initialRouteName={'Home'}
       screenOptions={{
-        // headerStyle: 'whitesmoke',
         tabBarActiveTintColor: 'black',
         tabBarShowLabel: false,
         tabBarStyle: {
-          backgroundColor: 'whitesmoke', 
-          height: 60,              
-          borderTopWidth: 1,        
-          borderTopColor: '#ccc',   
+          backgroundColor: 'whitesmoke',
+          height: 60,
+          borderTopWidth: 1,
+          borderTopColor: '#ccc',
         },
-        headerShown: false, // 👈 hide tab headers, drawer will handle headers
+        headerShown: false,
       }}
     >
       <Tab.Screen
@@ -37,9 +34,6 @@ const BottomTabNavigator = () => {
         component={SearchScreen}
         options={{
           headerTitle: 'Search',
-          headerTitleStyle: {
-            // fontFamily: "PTSans-Bold",
-          },
           tabBarIcon: ({ color }) => {
             return <Feather name="search" size={24} color={ color } />;
           },
@@ -68,9 +62,6 @@ const BottomTabNavigator = () => {
         component={CreatePostScreen}
         options={{
           headerTitle: 'Create post',
-          headerTitleStyle: {
-            // fontFamily: "PTSans-Bold",
-          },
           tabBarIcon: ({ color }) => {
             return <Feather name="plus-square" size={24} color={ color } />;
           },
@@ -81,9 +72,6 @@ const BottomTabNavigator = () => {
         component={ProfileScreen}
         options={{
           headerTitle: 'Profile',
-          headerTitleStyle: {
-            // fontFamily: "PTSans-Bold",
-          },
           tabBarIcon: ({ color }) => {
             return <Feather name="user" size={24} color={ color } />;
           },
@@ -94,9 +82,6 @@ const BottomTabNavigator = () => {
         component={TestDbScreen}
          options={{
           headerTitle: 'Login',
-          headerTitleStyle: {
-            // fontFamily: "PTSans-Bold",
-          },
           tabBarIcon: ({ color }) => {
             return <Feather name="user" size={24} color={ color } />;
           },
@@ -107,9 +92,6 @@ const BottomTabNavigator = () => {
         component={TestCreateFollower}
          options={{
           headerTitle: 'Login',
-          headerTitleStyle: {
-            // fontFamily: "PTSans-Bold",
-          },
           tabBarIcon: ({ color }) => {
             return <Feather name="user" size={24} color={ color } />;
           },
@@ -120,15 +102,11 @@ const BottomTabNavigator = () => {
         component={TestGetFollower}
          options={{
           headerTitle: 'Login',
-          headerTitleStyle: {
-            // fontFamily: "PTSans-Bold",
-          },
           tabBarIcon: ({ color }) => {
             return <Feather name="user" size={24} color={ color } />;
           },
         }}
       />
-      
     </Tab.Navigator>
   );
 }

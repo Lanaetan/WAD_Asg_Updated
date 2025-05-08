@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, FlatList, ScrollView } from "react-native";
 import dayjs from 'dayjs';
 import relativeTime from "dayjs/plugin/relativeTime";
 import Message from "../components/Message";
-import { useAuth } from "../contexts/AuthContext";
+
 dayjs.extend(relativeTime);
 
 // Define the type for a message
@@ -26,7 +26,6 @@ const MessageList: React.FC<MessageListProps> = ({ messages, currentUser }) => {
   const flatListRef = useRef<any>(null);
 
   useEffect(()=>{
-    // console.log('messagelist', messages);
     if (flatListRef.current && messages.length > 0) {
       flatListRef.current.scrollToEnd({ animated: true });
     }
@@ -37,10 +36,8 @@ const MessageList: React.FC<MessageListProps> = ({ messages, currentUser }) => {
       <FlatList
       ref={flatListRef}
         data={messages}
-        // keyExtractor={(item) => item.id?.toString()}
         keyExtractor={(item: any) => `${item.sender_id}-${item.receiver_id}-${item.created_at}`}
         renderItem={({ item }: any) => {
-          // console.log('Render item:', item); // Check the structure
           return (
             <Message 
               receiverId={item.receiver_id} 

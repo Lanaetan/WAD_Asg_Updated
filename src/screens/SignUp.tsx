@@ -1,5 +1,4 @@
 import { View, Text, StyleSheet, TouchableOpacity, Pressable, Alert } from 'react-native';
-// import { Feather } from '@react-native/vector-icons';
 import React, { useRef, useState } from 'react';
 import { TextInput } from 'react-native-gesture-handler';
 import SignIn from './SignIn';
