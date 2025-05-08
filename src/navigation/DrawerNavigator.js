@@ -288,6 +288,7 @@ const DrawerNavigator = () => {
             ),
           }}
         />
+
     </Drawer.Navigator>
   );
 };
