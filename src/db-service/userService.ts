@@ -104,6 +104,24 @@ try{
     throw Error('Failed to update user !!!');
   }
 }
+export const updateUserById = async (
+  db: SQLiteDatabase,
+  userID: string,
+  name: string,
+  username: string,
+  bio: string,
+  image: string
+) => {
+  try {
+    const query = 'UPDATE users SET name=?, username=?, bio=?, image=? WHERE id=?';
+    const parameters = [name, username, bio, image, userID];
+    await db.executeSql(query, parameters);
+  } catch (error) {
+    console.error(error);
+    throw new Error('Failed to update user by ID!');  // Changed to 'new Error'
+  }
+};
+
 
 export const deleteUser = async( 
     db: SQLiteDatabase,
