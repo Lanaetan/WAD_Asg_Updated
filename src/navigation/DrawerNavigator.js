@@ -25,7 +25,7 @@ import { AuthContext } from "../contexts/AuthContext";
 import { getUsersExceptCurrent } from '../db-service/userService';
 import { getDBConnection } from "../db-service/database";
 import { createMessage } from "../db-service/messageService";
-
+import SettingsScreen from '../screens/SettingsScreen';
 const Drawer = createDrawerNavigator();
 
 const MyDrawerComponent = (props) => {
@@ -278,6 +278,16 @@ const DrawerNavigator = () => {
             refresh={_query}
           />}
       </Drawer.Screen>
+
+      <Drawer.Screen
+          name="Settings"
+          component={SettingsScreen}
+          options={{
+            drawerIcon: ({ color }) => (
+              <Ionicons name="settings-outline" size={24} color={color} />
+            ),
+          }}
+        />
     </Drawer.Navigator>
   );
 };
