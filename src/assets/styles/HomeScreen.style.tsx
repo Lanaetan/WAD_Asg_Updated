@@ -1,11 +1,6 @@
 import {StyleSheet} from 'react-native';
 
 export default StyleSheet.create({
-  container: {
-    flex: 1,
-    width: '100%',
-    backgroundColor: '#f5f5f5',
-  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -21,6 +16,7 @@ export default StyleSheet.create({
     paddingVertical: 12,
     width: '100%',
   },
+  // Post item
   postCard: {
     backgroundColor: 'white',
     borderRadius: 8,
@@ -30,6 +26,9 @@ export default StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
     elevation: 2,
+  },
+  header: {
+
   },
   caption: {
     fontSize: 18,
@@ -41,6 +40,7 @@ export default StyleSheet.create({
     color: '#666',
     marginBottom: 4,
   },
+  // Image
   imageContainer: {
     marginTop: 12,
     width: '100%',
@@ -50,11 +50,27 @@ export default StyleSheet.create({
   },
   postImage: {
     width: '100%',
-    // Height will be dynamically calculated based on the image's aspect ratio
   },
   noImageText: {
     textAlign: 'center',
     padding: 20,
     color: '#999',
+  },
+  // Footer
+  footer: {
+    marginTop: 5,
+  },
+  timeInfo: {
+    fontSize: 14,
+    color: '#666',
+  },
+  // Post Buttons
+  ButtonTab: {
+    flexDirection: 'row',
+    
+  },
+  button: {
+    fontSize: 28,
+    marginRight: 8,
   },
 });
