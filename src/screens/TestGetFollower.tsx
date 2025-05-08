@@ -31,22 +31,13 @@ const TestGetFollower = () => {
             <FlatList
                 data={followers}
                 renderItem={({ item }) => (
-                    <View>
-                        <View>
-                            <Text>currentUser: {item.user_id}</Text>
-                            <Text>follower: {item.follower_id}</Text>
-                        </View>
-                        <FollowerListItem follower={item} />
+                    <View style={{backgroundColor: "lightgrey", marginBottom:20 }}>
+                        <Text>currentUser: {item.user_id}</Text>
+                        <Text>follower: {item.follower_id}</Text>
+                        <FollowerListItem follower={item} viewMode={followers}/>
                     </View>
-                    
                 )}
-            >
-
-            </FlatList>
-                
-
-        
-            {/* <FollowerList followers={followers} /> */}
+            />
         </View>
     )
 }

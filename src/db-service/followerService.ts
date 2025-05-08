@@ -17,6 +17,23 @@ export const getFollowersById = async( db: SQLiteDatabase, userId: string ): Pro
       }
 }
 
+export const getFollowingById = async( db: SQLiteDatabase, userId: string ): Promise<any> => {
+  try{
+      const followingData : any = [];
+      const query = `SELECT * FROM followers WHERE follower_id=?`;
+      const results = await db.executeSql(query,[userId]);
+      results.forEach((result: any) => {
+          (result.rows.raw()).forEach(( item:any ) => {
+              followingData.push(item);
+          })
+        });
+      return followingData;
+    } catch (error) {
+      console.error(error);
+      throw Error('Failed to get following users !!!');
+    }
+}
+
 
 export const createFollower = async( 
         db: SQLiteDatabase,
@@ -43,35 +60,74 @@ export const createFollower = async(
       }
 }
 
-export const updateUser = async( 
-    db: SQLiteDatabase,
-    name: string,
-    username: string,
-    password: string,
-    email : string,
-    image: string,
-    bio: string,
-    userID: string
+export const deleteFollower = async( 
+  db: SQLiteDatabase,
+  user_id: string,
+  follower_id: string,
+    ) => {
+    try{
+        const query = 'DELETE FROM followers WHERE user_id = ? AND follower_id = ?' ;
+        await db.executeSql(query,[user_id, follower_id]);
+    } catch (error) {
+        console.error(error);
+        throw Error('Failed to delete follower !!!');
+    }
+}
+
+export const isUserFollowing = async (
+  db: SQLiteDatabase,
+  user_id: string,
+  follower_id: string,
 ) => {
-try{
-    const query = 'UPDATE users SET name=?,username=?,password=?,email=?,image=?,bio=? WHERE id=?';
-    const parameters = [name,username,password,email,image,bio, userID]
-    await db.executeSql(query,parameters);
+  try {
+    const results = await db.executeSql(
+      `SELECT * FROM followers WHERE user_id = ? AND follower_id = ?`,
+      [user_id, follower_id]
+    );
+    const rows = results[0].rows;
+    return rows.length > 0;
   } catch (error) {
-    console.error(error);
-    throw Error('Failed to update user !!!');
+    console.error("Error checking follow status", error);
+    return false;
   }
 }
 
-export const deleteUser = async( 
-    db: SQLiteDatabase,
-    userId: string
-    ) => {
-    try{
-        const query = 'DELETE FROM users WHERE id = ?' ;
-        await db.executeSql(query,[userId]);
-    } catch (error) {
-        console.error(error);
-        throw Error('Failed to delete user !!!');
-    }
+export const countFollowers = async (
+  db: SQLiteDatabase,
+  user_id: string,
+) => {
+  try {
+    const results = await db.executeSql(
+      `SELECT COUNT(*) as count FROM followers WHERE user_id = ?`,
+      [user_id]
+    );
+
+    // Extract the count value from the results
+    const count = results[0].rows.item(0).count;
+
+    return count;  // Return the count as a number
+  } catch (error) {
+    console.error("Error checking followers count", error);
+    return false;
+  }
+}
+
+export const countFollowing = async (
+  db: SQLiteDatabase,
+  user_id: string,
+) => {
+  try {
+    const results = await db.executeSql(
+      `SELECT COUNT(*) as count FROM followers WHERE follower_id = ?`,
+      [user_id]
+    );
+
+    // Extract the count value from the results
+    const count = results[0].rows.item(0).count;
+
+    return count;  // Return the count as a number
+  } catch (error) {
+    console.error("Error checking following count", error);
+    return false;
+  }
 }

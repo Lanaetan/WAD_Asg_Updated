@@ -19,6 +19,10 @@ const TestCreateFollower = () => {
         }
     };
 
+    const findFollower = async () => {
+        
+    }
+
     return (
         <View style={styles.container}>
             <TextInput

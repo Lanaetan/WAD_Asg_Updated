@@ -9,7 +9,7 @@ import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import CreatePostScreen from '../screens/CreatePostScreen';
 import TestDbScreen from '../screens/TestDbScreen';
-import TestChatScreen from '../screens/TestChatScreen';
+import SearchScreen from '../screens/SearchScreen';
 import TestCreateFollower from "../screens/TestCreateFollower";
 import TestGetFollower from "../screens/TestGetFollower";
 
@@ -32,6 +32,19 @@ const BottomTabNavigator = () => {
         headerShown: false, // 👈 hide tab headers, drawer will handle headers
       }}
     >
+      <Tab.Screen
+        name="Search"
+        component={SearchScreen}
+        options={{
+          headerTitle: 'Search',
+          headerTitleStyle: {
+            // fontFamily: "PTSans-Bold",
+          },
+          tabBarIcon: ({ color }) => {
+            return <Feather name="search" size={24} color={ color } />;
+          },
+        }}
+      />
       <Tab.Screen
         name="Home"
         component={HomeScreen}
