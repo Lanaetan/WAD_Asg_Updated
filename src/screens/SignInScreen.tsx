@@ -88,7 +88,7 @@ const SignInScreen = ({ route, navigation }: any) => {
             </View>
           ) : (
             <TouchableOpacity style={styles.button} onPress={handleLogin}>
-              <Text style={styles.buttonText}>SignIn</Text>
+              <Text style={styles.buttonText}>Sign In</Text>
             </TouchableOpacity>
           )}
         </Animated.View>
