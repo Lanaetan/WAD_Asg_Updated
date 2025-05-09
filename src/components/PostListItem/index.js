@@ -2,6 +2,10 @@ import React, {useState, useEffect} from 'react';
 import {View, Text, Image, Dimensions, StyleSheet} from 'react-native';
 import {TouchableOpacity} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
+
+import { getUserById } from '../../db-service/userService';
+import { getDBConnection } from '../../db-service/database';
+
 import moment from 'moment';
 import styles from '../../assets/styles/HomeScreen.style';
 import LikeButton from './LikeButton';
@@ -52,10 +56,21 @@ const PostListItem = ({post}) => {
   }, [post.image]);
 
   // Navigate to user profile when username is pressed
-  const handleUsernamePress = () => {
-    navigation.navigate('UserProfile', {
-      searchedUser: {id: post.user_id, username: post.user_name},
-    });
+  const handleUsernamePress = async () => {
+    try {
+      const db = await getDBConnection();
+      const userDetails = await getUserById(db, post.user_id);
+      
+      if (userDetails) {
+        navigation.navigate('UserProfile', {
+          searchedUser: userDetails
+        });
+      } else {
+        console.error('User not found');
+      }
+    } catch (error) {
+      console.error('Error fetching user details:', error);
+    }
   };
 
   const imageUrl = cleanImageUrl(post.image);
