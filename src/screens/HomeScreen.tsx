@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
   FlatList,
   SafeAreaView,
   ActivityIndicator,
-  Alert
+  Alert,
 } from 'react-native';
-import { getDBConnection } from '../db-service/database';
-import { getPosts } from '../db-service/postService';
-import { getUserById } from '../db-service/userService';
-import { useAuth } from '../contexts/AuthContext';
+import {getDBConnection} from '../db-service/database';
+import {getPosts} from '../db-service/postService';
+import {getUserById} from '../db-service/userService';
+import {useAuth} from '../contexts/AuthContext';
 import PostListItem from '../components/PostListItem';
 import WeatherApp from '../components/PostListItem/Weather';
 import styles from '../assets/styles/HomeScreen.style';
@@ -20,12 +20,12 @@ const HomeScreen = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-  const { user } = useAuth();
+  const {user} = useAuth();
   const currentUserId = user?.id;
 
   const renderHeader = () => {
-    return <WeatherApp />
-  }
+    return <WeatherApp />;
+  };
 
   // Fetch user name by ID
   const fetchUserName = async (userId: any) => {
@@ -46,10 +46,10 @@ const HomeScreen = () => {
       const db = await getDBConnection();
       const postsData = await getPosts(db, currentUserId);
       const postsWithUserNames = await Promise.all(
-        postsData.map(async (post) => ({
+        postsData.map(async post => ({
           ...post,
           user_name: await fetchUserName(post.user_id),
-        }))
+        })),
       );
       setPosts(postsWithUserNames);
     } catch (error) {
@@ -59,6 +59,13 @@ const HomeScreen = () => {
       setLoading(false);
       setRefreshing(false);
     }
+  };
+
+  // Delete posts from the database
+  const handlePostDeleted = (deletedPostId: string) => {
+    setPosts(currentPosts =>
+      currentPosts.filter(post => post.id !== deletedPostId),
+    );
   };
 
   // Refresh posts when user pulls down
@@ -86,11 +93,11 @@ const HomeScreen = () => {
       <FlatList
         ListHeaderComponent={renderHeader}
         data={posts}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={item => item.id.toString()}
         contentContainerStyle={styles.listContent}
-        renderItem={({ item }) => (
+        renderItem={({item}) => (
           <View>
-            <PostListItem post={item} />
+            <PostListItem post={item} onPostDeleted={handlePostDeleted} />
           </View>
         )}
         refreshing={refreshing}

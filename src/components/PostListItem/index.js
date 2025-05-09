@@ -3,16 +3,17 @@ import {View, Text, Image, Dimensions, StyleSheet} from 'react-native';
 import {TouchableOpacity} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 
-import { getUserById } from '../../db-service/userService';
-import { getDBConnection } from '../../db-service/database';
+import {useAuth} from '../../contexts/AuthContext';
+import {getUserById} from '../../db-service/userService';
+import {getDBConnection} from '../../db-service/database';
 
 import moment from 'moment';
 import styles from '../../assets/styles/HomeScreen.style';
 import LikeButton from './LikeButton';
 import CommentButton from './CommentButton';
-import {useAuth} from '../../contexts/AuthContext';
+import DeleteButton from './DeleteButton';
 
-const PostListItem = ({post}) => {
+const PostListItem = ({post, onPostDeleted}) => {
   const navigation = useNavigation();
   const {user} = useAuth();
   const [isExpanded, setIsExpanded] = useState(false);
@@ -60,10 +61,10 @@ const PostListItem = ({post}) => {
     try {
       const db = await getDBConnection();
       const userDetails = await getUserById(db, post.user_id);
-      
+
       if (userDetails) {
         navigation.navigate('UserProfile', {
-          searchedUser: userDetails
+          searchedUser: userDetails,
         });
       } else {
         console.error('User not found');
@@ -127,8 +128,19 @@ const PostListItem = ({post}) => {
       {/* Post Footer */}
       <View style={styles.footer}>
         <View style={styles.ButtonTab}>
-        <LikeButton postId={post.id} />          
-        {user && <CommentButton postId={post.id} userId={user.id} />}
+          {/* Like Button */}
+          <LikeButton postId={post.id} />
+          {/* Comment Button */}
+          {user && <CommentButton postId={post.id} userId={user.id} />}
+          {/* Delete Button */}
+          {user && (
+            <DeleteButton
+              postId={post.id}
+              userId={user.id}
+              ownerId={post.user_id}
+              onPostDeleted={onPostDeleted}
+            />
+          )}
         </View>
         <View style={styles.userInfo}>
           <TouchableOpacity
