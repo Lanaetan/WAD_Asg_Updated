@@ -77,8 +77,8 @@ const Navigator = () => {
                 component={WelcomeScreen}
                 options={{ headerShown: false }}
               />
-              <Stack.Screen name="SignIn" component={SignInScreen} />
-              <Stack.Screen name="SignUp" component={SignUpScreen} />
+              <Stack.Screen name="Sign In" component={SignInScreen} />
+              <Stack.Screen name="Sign Up" component={SignUpScreen} />
             </>
           )}
         </Stack.Navigator>
