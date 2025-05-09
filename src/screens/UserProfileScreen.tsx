@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   bio: {
-    fontSize: 16,
+    fontSize: 14,
     color: "#666",
   },
   followButtonContainer: {

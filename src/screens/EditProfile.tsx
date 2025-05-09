@@ -123,26 +123,6 @@ const EditProfileScreen = () => {
   );
 };
 
-// return (
-//   <View style={styles.container}>
-//     <TouchableOpacity>
-//       <Image 
-//         source={{ uri: image ? image : "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg" }}
-//         style={styles.profileImage} 
-//       />
-//     </TouchableOpacity>
-//     <TextInput style={styles.input} value={name} onChangeText={setName} placeholder='name' />
-
-//     <TextInput style={styles.input} value={username} onChangeText={setUsername} placeholder='username' />
-
-//     <TextInput style={styles.input} value={bio} onChangeText={setBio} placeholder='bio' />
-
-//     <TextInput style={styles.input} value={image} onChangeText={setImage} placeholder='image url' />
-
-//     <Button title="Save Changes" onPress={handleSave} />
-//   </View>
-// );
-
 const styles = StyleSheet.create({
   container: { 
     flex: 1, 
@@ -176,7 +156,7 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     marginBottom: 10,
     alignSelf: 'center',
-    marginVertical: 30,
+    marginVertical: 15,
   },
 });
 

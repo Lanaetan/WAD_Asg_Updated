@@ -24,7 +24,6 @@ import { createMessage } from "../db-service/messageService";
 import SettingsScreen from '../screens/SettingsScreen';
 import { useSocket } from "../contexts/SocketContext";
 
-
 const Drawer = createDrawerNavigator();
 
 const MyDrawerComponent = (props) => {
