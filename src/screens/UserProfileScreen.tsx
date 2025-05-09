@@ -5,9 +5,9 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
-  ScrollView,
   ActivityIndicator,
 } from "react-native";
+import PostList from '../components/PostList'; 
 import { getDBConnection } from "../db-service/database";
 import {
   countFollowers,
@@ -16,6 +16,7 @@ import {
   deleteFollower,
   isUserFollowing,
 } from "../db-service/followerService";
+import { countPosts, getPostsByUser } from '../db-service/postService';
 import { useAuth } from "../contexts/AuthContext";
 
 const UserProfileScreen = ({ route, navigation }: any) => {
@@ -24,20 +25,26 @@ const UserProfileScreen = ({ route, navigation }: any) => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [followerCount, setFollowerCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
+  const [postCount, setPostCount] = useState(0);
+  const [posts, setPosts] = useState<any>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {
     try {
       const db = await getDBConnection();
-      const [followStatus, followers, following] = await Promise.all([
+      const [followStatus, followers, following, postCount, postsData] = await Promise.all([
         isUserFollowing(db, searchedUser.id, user.id),
         countFollowers(db, searchedUser.id),
         countFollowing(db, searchedUser.id),
+        countPosts(db, searchedUser.id),
+        getPostsByUser(db, searchedUser.id),
       ]);
 
       setIsFollowing(followStatus);
       setFollowerCount(followers);
       setFollowingCount(following);
+      setPostCount(postCount);
+      setPosts(postsData);
     } catch (error) {
       console.error("Error fetching user data", error);
     } finally {
@@ -69,66 +76,75 @@ const UserProfileScreen = ({ route, navigation }: any) => {
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.usernameContainer}>
-        <Text style={styles.username}>@{searchedUser.username}</Text>
-      </View>
+    <View style={styles.container}>
+      <View style={styles.upperProfileContainer}>
+        <View style={styles.usernameContainer}>
+          <Text style={styles.username}>@{searchedUser.username}</Text>
+        </View>
 
-      <View style={styles.profileRow}>
-        <Image style={styles.profileImage} source={{ uri: searchedUser.image }} />
-        <View style={styles.profileInfoContainer}>
-          <Text style={styles.name}>{searchedUser.name || searchedUser.username}</Text>
+        <View style={styles.profileRow}>
+          <Image style={styles.profileImage} source={{ uri: searchedUser.image }} />
+          <View style={styles.profileInfoContainer}>
+            <Text style={styles.name}>{searchedUser.name || searchedUser.username}</Text>
 
-          <View style={styles.statsRow}>
-            <TouchableOpacity
-              style={styles.statBox}
-              onPress={() =>
-                navigation.navigate("Followers", {
-                  searchedUser,
-                  viewMode: "followers",
-                })
-              }
-            >
-              <Text style={styles.statNumber}>{followerCount}</Text>
-              <Text style={styles.statLabel}>Followers</Text>
-            </TouchableOpacity>
+            <View style={styles.statsRow}>
+              <View style={styles.statBox}>
+                <Text style={styles.statNumber}>{postCount}</Text>
+                <Text style={styles.statLabel}>Posts</Text>
+              </View>
 
-            <TouchableOpacity
-              style={styles.statBox}
-              onPress={() =>
-                navigation.navigate("Followers", {
-                  searchedUser,
-                  viewMode: "following",
-                })
-              }
-            >
-              <Text style={styles.statNumber}>{followingCount}</Text>
-              <Text style={styles.statLabel}>Following</Text>
-            </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.statBox}
+                onPress={() =>
+                  navigation.navigate("Followers", {
+                    searchedUser,
+                    viewMode: "followers",
+                  })
+                }
+              >
+                <Text style={styles.statNumber}>{followerCount}</Text>
+                <Text style={styles.statLabel}>Followers</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.statBox}
+                onPress={() =>
+                  navigation.navigate("Followers", {
+                    searchedUser,
+                    viewMode: "following",
+                  })
+                }
+              >
+                <Text style={styles.statNumber}>{followingCount}</Text>
+                <Text style={styles.statLabel}>Following</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
-      </View>
 
-      <View style={styles.bioContainer}>
-        <Text style={styles.bio}>{searchedUser.bio}</Text>
-      </View>
-
-      {searchedUser.id !== user.id && (
-        <View style={styles.followButtonContainer}>
-          <TouchableOpacity
-            onPress={handleFollowToggle}
-            style={[
-              styles.followButton,
-              { backgroundColor: isFollowing ? "white" : "#0095f6", borderWidth: 1, borderColor: "#0095f6" },
-            ]}
-          >
-            <Text style={{ color: isFollowing ? "#0095f6" : "white" }}>
-              {isFollowing ? "Unfollow" : "Follow"}
-            </Text>
-          </TouchableOpacity>
+        <View style={styles.bioContainer}>
+          <Text style={styles.bio}>{searchedUser.bio}</Text>
         </View>
-      )}
-    </ScrollView>
+
+        {searchedUser.id !== user.id && (
+          <View style={styles.followButtonContainer}>
+            <TouchableOpacity
+              onPress={handleFollowToggle}
+              style={[
+                styles.followButton,
+                { backgroundColor: isFollowing ? "white" : "#0095f6", borderWidth: 1, borderColor: "#0095f6" },
+              ]}
+            >
+              <Text style={{ color: isFollowing ? "#0095f6" : "white" }}>
+                {isFollowing ? "Unfollow" : "Follow"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
+
+      <PostList posts={posts} />
+    </View>
   );
 };
 
@@ -138,11 +154,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+    padding: 0,
+  },
+  upperProfileContainer: {
     padding: 20,
-    
   },
   usernameContainer: {
-   
     marginBottom: 10,
   },
   username: {
@@ -174,11 +191,11 @@ const styles = StyleSheet.create({
   },
   statsRow: {
     flexDirection: "row",
-    justifyContent: "center", // Center both stat boxes
+    justifyContent: 'space-between',
   },
   statBox: {
-    alignItems: "center",
-    marginHorizontal: 20, // Space between boxes
+    alignItems: 'center',
+    marginHorizontal: 10,
   },
   statNumber: {
     fontSize: 16,
