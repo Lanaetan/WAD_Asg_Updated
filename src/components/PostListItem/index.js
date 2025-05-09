@@ -2,13 +2,18 @@ import React, {useState, useEffect} from 'react';
 import {View, Text, Image, Dimensions, StyleSheet} from 'react-native';
 import {TouchableOpacity} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
+
+import {useAuth} from '../../contexts/AuthContext';
+import {getUserById} from '../../db-service/userService';
+import {getDBConnection} from '../../db-service/database';
+
 import moment from 'moment';
 import styles from '../../assets/styles/HomeScreen.style';
 import LikeButton from './LikeButton';
 import CommentButton from './CommentButton';
-import {useAuth} from '../../contexts/AuthContext';
+import DeleteButton from './DeleteButton';
 
-const PostListItem = ({post}) => {
+const PostListItem = ({post, onPostDeleted}) => {
   const navigation = useNavigation();
   const {user} = useAuth();
   const [isExpanded, setIsExpanded] = useState(false);
@@ -52,10 +57,21 @@ const PostListItem = ({post}) => {
   }, [post.image]);
 
   // Navigate to user profile when username is pressed
-  const handleUsernamePress = () => {
-    navigation.navigate('UserProfile', {
-      searchedUser: {id: post.user_id, username: post.user_name},
-    });
+  const handleUsernamePress = async () => {
+    try {
+      const db = await getDBConnection();
+      const userDetails = await getUserById(db, post.user_id);
+
+      if (userDetails) {
+        navigation.navigate('UserProfile', {
+          searchedUser: userDetails,
+        });
+      } else {
+        console.error('User not found');
+      }
+    } catch (error) {
+      console.error('Error fetching user details:', error);
+    }
   };
 
   const imageUrl = cleanImageUrl(post.image);
@@ -112,8 +128,19 @@ const PostListItem = ({post}) => {
       {/* Post Footer */}
       <View style={styles.footer}>
         <View style={styles.ButtonTab}>
-          <LikeButton></LikeButton>
+          {/* Like Button */}
+          <LikeButton postId={post.id} />
+          {/* Comment Button */}
           {user && <CommentButton postId={post.id} userId={user.id} />}
+          {/* Delete Button */}
+          {user && (
+            <DeleteButton
+              postId={post.id}
+              userId={user.id}
+              ownerId={post.user_id}
+              onPostDeleted={onPostDeleted}
+            />
+          )}
         </View>
         <View style={styles.userInfo}>
           <TouchableOpacity

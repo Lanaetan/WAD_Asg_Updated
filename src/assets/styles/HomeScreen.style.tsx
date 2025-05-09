@@ -79,7 +79,7 @@ export default StyleSheet.create({
     marginRight: 8,
   },
   count: {
-    marginLeft: 4
+    marginRight: 15,
   },
   // User info
   userInfo: {

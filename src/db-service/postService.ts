@@ -108,3 +108,17 @@ export const countPosts = async (
     return 0;
   }
 };
+
+export const deletePost = async (
+  db: SQLiteDatabase,
+  postId: string,
+): Promise<void> => {
+  try {
+    const query = `DELETE FROM posts WHERE id = ?`;
+    await db.executeSql(query, [postId]);
+    console.log('Post deleted successfully');
+  } catch (error) {
+    console.error('Error deleting post:', error);
+    throw error;
+  }
+};
