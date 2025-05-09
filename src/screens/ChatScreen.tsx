@@ -6,7 +6,8 @@ import LottieView from 'lottie-react-native';
 import { useAuth } from "../contexts/AuthContext";
 import { getDBConnection } from "../db-service/database";
 import { createMessage, getMessagesBetween } from "../db-service/messageService";
-import socket from "../utils/socket";
+import { useSocket } from "../contexts/SocketContext";
+// import socket from "../utils/socket";
 
 LogBox.ignoreLogs([
   'Non-serializable values were found in the navigation state',
@@ -16,6 +17,7 @@ const ChatScreen = ({route, navigation}: any) => {
 
   const { id, username, image, refresh } = route.params; // got
   const { user } = useAuth(); 
+  const { socket } = useSocket();
 
   const [ messages, setMessages ] = useState<any>([]);
   const [loading, setLoading] = useState(true);
@@ -152,7 +154,7 @@ const ChatScreen = ({route, navigation}: any) => {
           <TextInput 
             ref={inputRef}
             onChangeText={value => {
-              console.log('Typed message:', value); // <-- ADD THIS
+              console.log('Typed message:', value); 
               textRef.current = value;
             }}
             style={styles.input} 

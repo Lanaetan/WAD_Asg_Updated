@@ -3,7 +3,6 @@ import { LogBox, ToastAndroid } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useAuth } from '../contexts/AuthContext';
-import socket from '../utils/socket';
 
 // Screens
 import ChatScreen from '../screens/ChatScreen';
@@ -24,32 +23,32 @@ const Stack = createStackNavigator();
 const Navigator = () => {
   const { isAuthenticated } = useAuth();
 
-  useEffect(() => {
-      socket.on('connect', () => {
-        console.log('Connected with ID:', socket.id);
-        socket.emit('mobile_client_connected', { connected: true }, (response) => {
-          console.log(response);
-        });
-        ToastAndroid.show('Connected to server', ToastAndroid.LONG);
-      });
+  // useEffect(() => {
+  //     socket.on('connect', () => {
+  //       console.log('Connected with ID:', socket.id);
+  //       socket.emit('mobile_client_connected', { connected: true }, (response) => {
+  //         console.log(response);
+  //       });
+  //       ToastAndroid.show('Connected to server', ToastAndroid.LONG);
+  //     });
   
-      socket.on('connect_to_client', (data) => {
-        const greets = JSON.parse(data);
-        console.log(greets);
-      });
+  //     socket.on('connect_to_client', (data) => {
+  //       const greets = JSON.parse(data);
+  //       console.log(greets);
+  //     });
   
-      socket.on('error', (error) => {
-        ToastAndroid.show('Failed to connect to server', ToastAndroid.LONG);
-      });
+  //     socket.on('error', (error) => {
+  //       ToastAndroid.show('Failed to connect to server', ToastAndroid.LONG);
+  //     });
   
-      socket.on('disconnect', () => {
-        console.log('Disconnected from socket server');
-      });
+  //     socket.on('disconnect', () => {
+  //       console.log('Disconnected from socket server');
+  //     });
       
-      return () => {
-        socket.disconnect();
-      };
-    }, []);
+  //     return () => {
+  //       socket.disconnect();
+  //     };
+  //   }, []);
 
     return (
       <NavigationContainer>

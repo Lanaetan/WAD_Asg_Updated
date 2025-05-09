@@ -14,7 +14,7 @@ import {
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Feather from "react-native-vector-icons/Feather";
 import AntDesign from "react-native-vector-icons/AntDesign";
-import socket from "../utils/socket";
+// import socket from "../utils/socket";
 import ChatsScreen from "../screens/ChatsScreen";
 import BottomTabNavigator from "./BottomTabNavigator";
 import { AuthContext } from "../contexts/AuthContext";
@@ -22,12 +22,14 @@ import { getUsersExceptCurrent } from '../db-service/userService';
 import { getDBConnection } from "../db-service/database";
 import { createMessage } from "../db-service/messageService";
 import SettingsScreen from '../screens/SettingsScreen';
-import WelcomeScreen from "../screens/WelcomeScreen"; 
+import { useSocket } from "../contexts/SocketContext";
+
 
 const Drawer = createDrawerNavigator();
 
 const MyDrawerComponent = (props) => {
   const { user, logout } = useContext(AuthContext);
+  const { socket } = useSocket();
 
   const handleLogout = async (navigation) => {
     await logout();  // Perform logout logic
@@ -42,17 +44,19 @@ const MyDrawerComponent = (props) => {
       const messageBag = JSON.parse(data);
       const isoTimestamp = new Date(messageBag.created_at).toISOString();
   
-      try {
-        await createMessage(
-          await getDBConnection(),
-          messageBag.receiver_id,
-          messageBag.sender_id,
-          messageBag.message,
-          isoTimestamp
+      if (messageBag.sender_id !== user.id) {
+        try {
+          await createMessage(
+            await getDBConnection(),
+            messageBag.receiver_id,
+            messageBag.sender_id,
+            messageBag.message,
+            isoTimestamp
         );        
-      } catch (error) {
-        console.error(error);
-        Alert.alert("Error", "Failed to save message");
+        } catch (error) {
+          console.error(error);
+          Alert.alert("Error", "Failed to save message");
+        }
       }
     };
   

@@ -15,7 +15,7 @@ const PostList = ({posts}) => {
             key={numColumns} // Important to avoid FlatList column crash
             renderItem={({ item }) => (
                 <View style={styles.itemContainer}>
-                <Image source={{ uri: item.image }} style={styles.image} />
+                    <Image source={{ uri: item.image }} style={styles.image} />
                 </View>
             )}
         /> 
