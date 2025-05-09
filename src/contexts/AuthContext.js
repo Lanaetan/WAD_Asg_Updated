@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     if (!email || !password) {
-      return { success: false, message: 'Email and password are required.' };
+      return { success: false, message: 'Please fill in both email and password.' };
     }
   
     if (!email.includes('@')) {
@@ -91,7 +91,7 @@ export const AuthProvider = ({ children }) => {
   const register = async (name, username, password, email, image, bio) => {
     try {
       if (!email || !password || !username) {
-        return { success: false, message: 'All fields are required.' };
+        return { success: false, message: 'Please fill in all required fields.' };
       }
     // Email format validation
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
