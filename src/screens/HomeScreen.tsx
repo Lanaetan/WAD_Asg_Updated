@@ -12,6 +12,7 @@ import { getPosts } from '../db-service/postService';
 import { getUserById } from '../db-service/userService';
 import { useAuth } from '../contexts/AuthContext';
 import PostListItem from '../components/PostListItem';
+import WeatherApp from '../components/PostListItem/Weather';
 import styles from '../assets/styles/HomeScreen.style';
 
 const HomeScreen = () => {
@@ -21,6 +22,10 @@ const HomeScreen = () => {
 
   const { user } = useAuth();
   const currentUserId = user?.id;
+
+  const renderHeader = () => {
+    return <WeatherApp />
+  }
 
   // Fetch user name by ID
   const fetchUserName = async (userId: any) => {
@@ -77,8 +82,9 @@ const HomeScreen = () => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView>
       <FlatList
+        ListHeaderComponent={renderHeader}
         data={posts}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.listContent}

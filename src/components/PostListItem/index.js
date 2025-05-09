@@ -8,8 +8,6 @@ import LikeButton from './LikeButton';
 import CommentButton from './CommentButton';
 import {useAuth} from '../../contexts/AuthContext';
 
-import WeatherApp from './Weather';
-
 const PostListItem = ({post}) => {
   const navigation = useNavigation();
   const {user} = useAuth();
@@ -73,9 +71,6 @@ const PostListItem = ({post}) => {
 
   return (
     <View style={styles.postCard}>
-      <WeatherApp>
-      
-      </WeatherApp>
       {/* Post Header */}
       <View>
         <Text
