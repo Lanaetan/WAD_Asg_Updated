@@ -8,7 +8,8 @@ export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const newSocket = io('http://192.168.0.14:5050/chat', {
+    // const newSocket = io('http://192.168.0.14:5050/chat', {
+    const newSocket = io('http://10.0.2.2:5050/chat', {
       transports: ['websocket'],
     }
 
