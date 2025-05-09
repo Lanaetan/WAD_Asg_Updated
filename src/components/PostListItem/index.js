@@ -27,9 +27,11 @@ const PostListItem = ({post, onPostDeleted}) => {
     return moment(dateString).fromNow();
   };
 
-  // Removing width and height parameters from image url
-  const cleanImageUrl = url =>
-    url ? url.replace(/w_\d+/, '').replace(/h_\d+/, '') : null;
+  // Get image url
+  const ImageUrl = url => {
+    if (!url) return null;
+    return url;
+  };
 
   useEffect(() => {
     // Set initial time ago
@@ -45,7 +47,7 @@ const PostListItem = ({post, onPostDeleted}) => {
 
   useEffect(() => {
     if (post.image) {
-      const imageUrl = cleanImageUrl(post.image);
+      const imageUrl = ImageUrl(post.image);
       Image.getSize(
         imageUrl,
         (width, height) => {
@@ -74,7 +76,7 @@ const PostListItem = ({post, onPostDeleted}) => {
     }
   };
 
-  const imageUrl = cleanImageUrl(post.image);
+  const imageUrl = ImageUrl(post.image);
 
   const imageStyle =
     imageUrl && imageDimensions
