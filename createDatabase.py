@@ -72,16 +72,16 @@ cursor.executemany('''
     INSERT INTO users (name, username, password, email, image, bio)
     VALUES (?, ?, ?, ?, ?, ?)
 ''', [
-    ('Qiao Ling', 'qiaoling_77', 'hashed_password', 'qiaoling@example.com', 'https://static.myfigurecollection.net/upload/entries/1/320090-48b39.jpg', 'Dieting'),
-    ('Lu Guang', 'luguang_92', 'hashed_password', 'luguang@example.com', 'https://pbs.twimg.com/profile_images/1873536351678664704/6IEQ-nVu_400x400.jpg', "Hey there! I'm using Insta"),
-    ('Cheng Xiao Shi', 'xiaoshi_03', 'hashed_password', 'xiaoshi@example.com', 'https://pbs.twimg.com/media/FMOCzfWWUAgBbOZ.jpg', 'Yahoooo!!!'),
-    ('Li Tian Xi', 'litianxi_09', 'hashed_password', 'litianxi@example.com', 'https://pbs.twimg.com/media/GBmm_28WsAAtfBC.jpg', '><'),
-    ('Li Tian Chen', 'litianchen_88', 'hashed_password', 'litianchen@example.com', 'https://s4.anilist.co/file/anilistcdn/character/large/b313878-X0gZ1Q4CJkHf.png', 'Huh?'),
-    ('Vein', 'vein_66', 'hashed_password', 'vein@example.com', 'https://i.pinimg.com/236x/08/a3/66/08a366abd1310f5ab4d9873a02c9f903.jpg', 'Hmmmmm'),
-    ('Xu Shan Shan', 'xushan_07', 'hashed_password', 'xushan@example.com', 'https://static.wikia.nocookie.net/shiguang-dailiren/images/7/70/Xu_Shanshan_Profile.png/revision/latest?cb=20241101025448', 'Good Morning! Sunshine!'),
-    ('Felix', 'felix_44', 'hashed_password', 'felix@example.com', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5lPVtprb5pu2CIhubHijvQ_t9KsCtjkI-cQ&s', 'Need sleeepppp'),
-    ('Liu Xiao', 'liuxiao_99', 'hashed_password', 'liuxiao@example.com', 'https://cdn.myanimelist.net/r/200x268/images/characters/11/580922.jpg?s=d5cad682288409f96be03ad09d79f4ec', 'Busy'),
-    ('Hao Jun Pro', 'hj_666', 'hashed_password', 'haojun@example.com', 'https://cdn.myanimelist.net/r/200x268/images/characters/11/580922.jpg?s=d5cad682288409f96be03ad09d79f4ec', 'No mood to eat')
+    ('Qiao Ling', 'qiaoling_77', '123456', 'qiaoling@example.com', 'https://static.myfigurecollection.net/upload/entries/1/320090-48b39.jpg', 'Dieting'),
+    ('Lu Guang', 'luguang_92', '123456', 'luguang@example.com', 'https://pbs.twimg.com/profile_images/1873536351678664704/6IEQ-nVu_400x400.jpg', "Hey there! I'm using Insta"),
+    ('Cheng Xiao Shi', 'xiaoshi_03', '123456', 'xiaoshi@example.com', 'https://pbs.twimg.com/media/FMOCzfWWUAgBbOZ.jpg', 'Yahoooo!!!'),
+    ('Li Tian Xi', 'litianxi_09', '123456', 'litianxi@example.com', 'https://pbs.twimg.com/media/GBmm_28WsAAtfBC.jpg', '><'),
+    ('Li Tian Chen', 'litianchen_88', '123456', 'litianchen@example.com', 'https://s4.anilist.co/file/anilistcdn/character/large/b313878-X0gZ1Q4CJkHf.png', 'Huh?'),
+    ('Vein', 'vein_66', '123456', 'vein@example.com', 'https://i.pinimg.com/236x/08/a3/66/08a366abd1310f5ab4d9873a02c9f903.jpg', 'Hmmmmm'),
+    ('Xu Shan Shan', 'xushan_07', '123456', 'xushan@example.com', 'https://static.wikia.nocookie.net/shiguang-dailiren/images/7/70/Xu_Shanshan_Profile.png/revision/latest?cb=20241101025448', 'Good Morning! Sunshine!'),
+    ('Felix', 'felix_44', '123456', 'felix@example.com', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5lPVtprb5pu2CIhubHijvQ_t9KsCtjkI-cQ&s', 'Need sleeepppp'),
+    ('Liu Xiao', 'liuxiao_99', '123456', 'liuxiao@example.com', 'https://cdn.myanimelist.net/r/200x268/images/characters/11/580922.jpg?s=d5cad682288409f96be03ad09d79f4ec', 'Busy'),
+    ('Hao Jun Pro', 'hj_666', '123456', 'haojun@example.com', 'https://cdn.myanimelist.net/r/200x268/images/characters/11/580922.jpg?s=d5cad682288409f96be03ad09d79f4ec', 'No mood to eat')
 ])
 
 cursor.executemany('''
