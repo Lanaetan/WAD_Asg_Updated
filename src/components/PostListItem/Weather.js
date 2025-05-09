@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
+import {View, Text, TouchableOpacity, StyleSheet, Image} from 'react-native';
 import axios from 'axios';
 
 const WeatherApp = () => {
@@ -74,27 +74,32 @@ const WeatherApp = () => {
 
   return (
     <View style={styles.weatherCard}>
-      <View style={styles.weatherHeader}>
-        <Text style={styles.weatherTitle}>Weather Update</Text>
-        <TouchableOpacity style={styles.refreshButton} onPress={getWeather}>
-          <Text style={styles.refreshText}>Refresh</Text>
-        </TouchableOpacity>
-      </View>
-
       {loading && (
         <Text style={styles.loadingText}>Loading weather data...</Text>
       )}
       {error && <Text style={styles.errorText}>{error}</Text>}
       {weather && (
         <View style={styles.weatherContent}>
-          <Text style={styles.cityName}>{weather.name}</Text>
-          <Text style={styles.temperature}>
-            {Math.round(weather.main.temp)}°C
-          </Text>
-          <Text style={styles.description}>
-            {weather.weather[0].description.charAt(0).toUpperCase() +
-              weather.weather[0].description.slice(1)}
-          </Text>
+          <View style={styles.weatherInfo}>
+            <Text style={styles.cityName}>{weather.name}</Text>
+            <View style={styles.weatherDetails}>
+              <View style={styles.textContainer}>
+                <Text style={styles.temperature}>
+                  {Math.round(weather.main.temp)}°C
+                </Text>
+                <Text style={styles.description}>
+                  {weather.weather[0].description.charAt(0).toUpperCase() +
+                    weather.weather[0].description.slice(1)}
+                </Text>
+              </View>
+              <Image
+                source={{
+                  uri: `https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`,
+                }}
+                style={styles.weatherIcon}
+              />
+            </View>
+          </View>
         </View>
       )}
     </View>
@@ -102,41 +107,36 @@ const WeatherApp = () => {
 };
 
 const styles = StyleSheet.create({
+  /* Card Container */
   weatherCard: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 10,
+    backgroundColor: 'white',
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 16,
+    width: '100%',
+    borderWidth: 1,
+    borderColor: '#ccc',
     elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
   },
-  weatherHeader: {
+
+  /* Layout Containers */
+  weatherContent: {
+    flexDirection: 'column',
+  },
+  weatherInfo: {
+    width: '100%',
+  },
+  weatherDetails: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    marginTop: 5,
   },
-  weatherTitle: {
-    fontSize: 18,
-    color: 'black',
-    fontWeight: 'bold',
+  textContainer: {
+    flex: 1,
   },
-  refreshButton: {
-    padding: 8,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 5,
-  },
-  refreshText: {
-    color: '#666',
-    fontSize: 14,
-  },
-  weatherContent: {
-    alignItems: 'center',
-    paddingVertical: 10,
-  },
+
+  /* Text Styles */
   cityName: {
     fontSize: 20,
     fontWeight: 'bold',
@@ -153,6 +153,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
   },
+
+  /* Image Styles */
+  weatherIcon: {
+    width: 100,
+    height: 100,
+  },
+
+  /* Status Messages */
   loadingText: {
     textAlign: 'center',
     color: '#666',
