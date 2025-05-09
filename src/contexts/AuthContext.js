@@ -70,18 +70,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // const logout = async () => {
-  //   try{
-  //     console.log('Logging out...');
-  //     await auth.signOut();
-  //     return {success: true};
-  //   }catch (error) {
-  //     console.error('Logout error:', error);
-  //     return {success: false, message: error.message, error: error};
-  //   }
-  // };
-
-
   const logout = async () => {
     setUser(null);
     setIsAuthenticated(false);
