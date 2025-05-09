@@ -16,7 +16,6 @@ export const SocketProvider = ({ children }) => {
     // const newSocket = io('http://10.0.2.2:5050/chat', {
     //   transports: ['websocket'],
     // }
-    
 
     newSocket.on('connect', () => {
       console.log('Connected with ID:', newSocket.id);
