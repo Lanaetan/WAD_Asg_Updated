@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import axios from 'axios';
 
 const WeatherApp = () => {
@@ -18,12 +18,12 @@ const WeatherApp = () => {
           params: {
             q: 'Kuala Lumpur, MY',
             appid: 'e0f24260d515e6220225cf340babff5a',
-            units: 'metric'
-          }
-        }
+            units: 'metric',
+          },
+        },
       );
       setWeather(response.data);
-      console.info("Weather fetched!");
+      console.info('Weather fetched!');
     } catch (err) {
       setError('Error fetching weather data');
     } finally {
@@ -32,30 +32,68 @@ const WeatherApp = () => {
   };
 
   useEffect(() => {
-    getWeather();
+    let mounted = true;
+
+    const fetchWeather = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await axios.get(
+          'https://api.openweathermap.org/data/2.5/weather',
+          {
+            params: {
+              q: 'Kuala Lumpur, MY',
+              appid: 'e0f24260d515e6220225cf340babff5a',
+              units: 'metric',
+            },
+          },
+        );
+        if (mounted) {
+          setWeather(response.data);
+          console.info('Weather fetched!');
+        }
+      } catch (err) {
+        if (mounted) {
+          setError('Error fetching weather data');
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchWeather();
+
+    // Cleanup function
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   return (
     <View style={styles.weatherCard}>
       <View style={styles.weatherHeader}>
         <Text style={styles.weatherTitle}>Weather Update</Text>
-        <TouchableOpacity 
-          style={styles.refreshButton} 
-          onPress={getWeather}
-        >
+        <TouchableOpacity style={styles.refreshButton} onPress={getWeather}>
           <Text style={styles.refreshText}>Refresh</Text>
         </TouchableOpacity>
       </View>
-      
-      {loading && <Text style={styles.loadingText}>Loading weather data...</Text>}
+
+      {loading && (
+        <Text style={styles.loadingText}>Loading weather data...</Text>
+      )}
       {error && <Text style={styles.errorText}>{error}</Text>}
       {weather && (
         <View style={styles.weatherContent}>
           <Text style={styles.cityName}>{weather.name}</Text>
-          <Text style={styles.temperature}>{Math.round(weather.main.temp)}°C</Text>
+          <Text style={styles.temperature}>
+            {Math.round(weather.main.temp)}°C
+          </Text>
           <Text style={styles.description}>
-            {weather.weather[0].description.charAt(0).toUpperCase() + 
-             weather.weather[0].description.slice(1)}
+            {weather.weather[0].description.charAt(0).toUpperCase() +
+              weather.weather[0].description.slice(1)}
           </Text>
         </View>
       )}
@@ -71,7 +109,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     elevation: 2,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
   },
@@ -83,6 +121,7 @@ const styles = StyleSheet.create({
   },
   weatherTitle: {
     fontSize: 18,
+    color: 'black',
     fontWeight: 'bold',
   },
   refreshButton: {
@@ -101,6 +140,7 @@ const styles = StyleSheet.create({
   cityName: {
     fontSize: 20,
     fontWeight: 'bold',
+    color: 'black',
     marginBottom: 5,
   },
   temperature: {

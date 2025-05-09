@@ -112,8 +112,8 @@ const PostListItem = ({post}) => {
       {/* Post Footer */}
       <View style={styles.footer}>
         <View style={styles.ButtonTab}>
-          <LikeButton></LikeButton>
-          {user && <CommentButton postId={post.id} userId={user.id} />}
+        <LikeButton postId={post.id} />          
+        {user && <CommentButton postId={post.id} userId={user.id} />}
         </View>
         <View style={styles.userInfo}>
           <TouchableOpacity

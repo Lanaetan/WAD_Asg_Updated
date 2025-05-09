@@ -174,7 +174,7 @@ const CommentButton = ({postId, userId}) => {
           size={24}
           color="black"
         />
-        <Text style={styles.Count}>{commentCount}</Text>
+        <Text style={styles.count}>{commentCount}</Text>
       </TouchableOpacity>
     </View>
   );
