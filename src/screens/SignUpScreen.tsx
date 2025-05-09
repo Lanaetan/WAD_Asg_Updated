@@ -184,7 +184,7 @@ const SignUpScreen = ({ navigation }: any) => {
         <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 10 }}>
           <Text>Already have an account? </Text>
           <TouchableOpacity onPress={() => navigation.navigate('SignIn')}>
-            <Text style={{ color: '#0284c7' }}>Sign In</Text>
+            <Text style={{ color: '#0284c7' }}>SignIn</Text>
           </TouchableOpacity>
         </View>
       </View>
