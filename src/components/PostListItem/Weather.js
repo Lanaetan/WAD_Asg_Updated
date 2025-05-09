@@ -7,30 +7,6 @@ const WeatherApp = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const getWeather = async () => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const response = await axios.get(
-        'https://api.openweathermap.org/data/2.5/weather',
-        {
-          params: {
-            q: 'Kuala Lumpur, MY',
-            appid: 'e0f24260d515e6220225cf340babff5a',
-            units: 'metric',
-          },
-        },
-      );
-      setWeather(response.data);
-      console.info('Weather fetched!');
-    } catch (err) {
-      setError('Error fetching weather data');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
     let mounted = true;
 
