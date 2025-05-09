@@ -1,66 +1,3 @@
-// import React, { createContext, useContext, useEffect, useRef, ReactNode } from 'react';
-// import { ToastAndroid } from 'react-native';
-// import io, { Socket } from 'socket.io-client';
-
-// // Define a proper type for the context value
-// interface SocketContextProps {
-//   socket: Socket | null;
-// }
-
-// // Create the context with an initial value
-// const SocketContext = createContext<SocketContextProps>({ socket: null });
-
-// // Define props type for the provider
-// interface SocketProviderProps {
-//   children: ReactNode;
-// }
-
-// export const SocketProvider = ({ children }: SocketProviderProps) => {
-//   const socketRef = useRef<Socket | null>(null);
-
-//   useEffect(() => {
-//     socketRef.current = io('http://192.168.0.14:5050/chat', {
-//       transports: ['websocket'],
-//     });
-
-//     socketRef.current.on('connect', () => {
-//       console.log('Connected with ID:', socketRef.current?.id);
-//       socketRef.current?.emit('mobile_client_connected', { connected: true }, (response: any) => {
-//         console.log(response);
-//       });
-//       ToastAndroid.show('Connected to server', ToastAndroid.LONG);
-//     });
-
-//     socketRef.current.on('connect_to_client', (data: string) => {
-//       const greets = JSON.parse(data);
-//       console.log(greets);
-//     });
-
-//     socketRef.current.on('error', (error: any) => {
-//       ToastAndroid.show('Failed to connect to server', ToastAndroid.LONG);
-//     });
-
-//     socketRef.current.on('disconnect', () => {
-//       console.log('Disconnected from socket server');
-//     });
-
-//     return () => {
-//       socketRef.current?.disconnect();
-//     };
-//   }, []);
-
-//   return (
-//     <SocketContext.Provider value={{ socket: socketRef.current }}>
-//       {children}
-//     </SocketContext.Provider>
-//   );
-// };
-
-// // Hook to use the socket context
-// export const useSocket = () => {
-//   return useContext(SocketContext);
-// };
-
 import React, { createContext, useContext, useEffect, useRef, ReactNode, useState } from 'react';
 import { ToastAndroid } from 'react-native';
 import io, { Socket } from 'socket.io-client';
@@ -73,7 +10,12 @@ export const SocketProvider = ({ children }) => {
   useEffect(() => {
     const newSocket = io('http://192.168.0.14:5050/chat', {
       transports: ['websocket'],
-    });
+    }
+
+    // const newSocket = io('http://10.0.2.2:5050/chat', {
+    //   transports: ['websocket'],
+    // }
+  );
 
     newSocket.on('connect', () => {
       console.log('Connected with ID:', newSocket.id);

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, ActivityIndicator, ScrollView, Button, TouchableOpacity } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
 import { getUserById } from '../db-service/userService';
@@ -13,6 +13,10 @@ const ProfileScreen = ({ navigation }: any) => {
   const [followerCount, setFollowerCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
   const [postCount, setPostCount] = useState(0);
+
+  useEffect(()=>{
+    console.log('user', user);
+  })
 
   useFocusEffect(
     useCallback(() => {
@@ -79,6 +83,7 @@ const ProfileScreen = ({ navigation }: any) => {
           </View>
         </View>
       </View>
+      
 
       <View style={styles.bioContainer}>
         <Text style={styles.bio}>{userDetails.bio}</Text>
@@ -150,7 +155,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   bio: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#666',
   },
   editButtonContainer: {

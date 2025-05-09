@@ -3,7 +3,7 @@ import React, { useRef, useState } from 'react';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import { useAuth } from '../contexts/AuthContext';
 
-const SignIn = ({ route, navigation }: any) => {
+const SignInScreen = ({ route, navigation }: any) => {
   const emailRef = useRef('');
   const passwordRef = useRef('');
   const [isLoading, setIsLoading] = useState(false);
@@ -104,7 +104,7 @@ const SignIn = ({ route, navigation }: any) => {
   );
 };
 
-export default SignIn;
+export default SignInScreen;
 
 const styles = StyleSheet.create({
   container: {

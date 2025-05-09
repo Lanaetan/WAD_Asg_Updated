@@ -58,7 +58,10 @@ const SearchScreen = () => {
               source={{ uri: item.image || 'https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg' }} 
               style={styles.image} 
             />
-            <Text style={styles.item}>{item.username}</Text>
+            <View style={styles.userList}>
+              <Text style={styles.username}>{item.username}</Text>
+              <Text style={styles.name}>{item.name}</Text>
+            </View>
           </View>
       </TouchableOpacity>
       )}
@@ -90,9 +93,22 @@ const styles = StyleSheet.create({
     paddingVertical: 0, 
     paddingLeft: 8, 
   },
-  item: {
+  userList: {
+    flex: 1,
+    flexDirection: 'column',
+    borderBlockColor: 'lightgray',
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    padding: 3,
+  },
+  username: {
     fontSize: 16,
-    marginVertical: 6,
+    paddingHorizontal: 15,
+    marginBottom: 2,
+    fontWeight: 'bold'
+  },
+  name: {
+    fontSize: 14,
+    marginVertical: 2,
     paddingHorizontal: 15,
   },
   content: {

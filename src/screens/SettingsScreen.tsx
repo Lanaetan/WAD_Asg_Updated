@@ -2,6 +2,11 @@ import React, { useState } from 'react';
 import { Linking } from 'react-native';
 import { View, ScrollView, Switch } from 'react-native';
 import { List, Divider, Text } from 'react-native-paper';
+import { LogBox } from 'react-native';
+
+LogBox.ignoreLogs([
+  'The "EXNativeModulesProxy" native module is not exported through NativeModules',
+]);
 
 const SettingsScreen = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);

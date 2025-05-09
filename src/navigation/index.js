@@ -7,8 +7,8 @@ import socket from '../utils/socket';
 
 // Screens
 import ChatScreen from '../screens/ChatScreen';
-import SignIn from '../screens/SignIn';
-import SignUp from '../screens/SignUp';
+import SignInScreen from '../screens/SignInScreen';
+import SignUpScreen from '../screens/SignUpScreen';
 import UserProfileScreen from '../screens/UserProfileScreen';
 import FollowersScreen from '../screens/FollowersScreen';
 import DrawerNavigator from './DrawerNavigator';
@@ -78,8 +78,8 @@ const Navigator = () => {
                 component={WelcomeScreen}
                 options={{ headerShown: false }}
               />
-              <Stack.Screen name="SignIn" component={SignIn} />
-              <Stack.Screen name="SignUp" component={SignUp} />
+              <Stack.Screen name="SignIn" component={SignInScreen} />
+              <Stack.Screen name="SignUp" component={SignUpScreen} />
             </>
           )}
         </Stack.Navigator>

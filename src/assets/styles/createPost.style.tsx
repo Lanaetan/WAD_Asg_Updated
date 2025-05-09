@@ -107,4 +107,18 @@ export default StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+  draftMessage: {
+    marginHorizontal: 50,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#ffffcc',
+    borderWidth: 1,
+    borderColor: 'darkyellow',
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    zIndex: 9999,
+  },
 });

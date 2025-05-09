@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, Image, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, Image, TextInput, StyleSheet, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import { useAuth } from '../contexts/AuthContext';
+import { useCreatePost } from '../contexts/Post/CreatePostContext';
+import { uploadImageToCloudinary } from '../utils/cloudinary';
+import { getDBConnection } from '../db-service/database';
 
-const SignUp = ({ route, navigation }: any) => {
+const SignUpScreen = ({ navigation }: any) => {
   const [isLoading, setIsLoading] = useState(false);
   const [step, setStep] = useState(1);
   const { register } = useAuth();
@@ -12,8 +15,14 @@ const SignUp = ({ route, navigation }: any) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
-  const [image, setImage] = useState('');
+  const [image, setImage] = useState('https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg');
   const [bio, setBio] = useState('');
+
+  const {
+    selectedImage,
+    setSelectedImage,
+    pickImage,
+  } = useCreatePost();
 
   const handleContinue = () => {
     if (!name || !username || !email || !password) {
@@ -29,20 +38,36 @@ const SignUp = ({ route, navigation }: any) => {
       return;
     }
 
-    setIsLoading(true);
-    const response = await register(name, username, password, email, image, bio);
-    setIsLoading(false);
+    try {
+      console.log('selected image: ', selectedImage);
+      const imageUrl = selectedImage ? await uploadImageToCloudinary(selectedImage) : null;
+      console.log('Image URL:', imageUrl);
+  
+      if (!imageUrl) {
+        Alert.alert('Error', 'Image upload failed.', [{ text: 'OK' }]);
+        return;
+      }      
 
-    if (!response.success) {
-      Alert.alert('Sign Up', response.message);
-    } else {
-      Alert.alert('Sign Up Successful', 'Please sign in with your credentials');
-      navigation.navigate('SignIn');
+      setSelectedImage(null);
+
+      setIsLoading(true);
+      const response = await register(name, username, password, email, imageUrl, bio);
+      setIsLoading(false);
+
+      if (!response.success) {
+        Alert.alert('Sign Up', response.message);
+      } else {
+        Alert.alert('Sign Up Successful', 'Please sign in with your credentials');
+        navigation.navigate('SignIn');
+      }
+    } catch (error) {
+      console.error('Create user error:', error);
+      Alert.alert('Error', 'Failed to create user.', [{ text: 'OK' }]);
     }
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Image style={styles.image} source={require('../../assets/images/background.png')} />
       <View style={styles.lightImage}>
         <Animated.Image
@@ -108,13 +133,32 @@ const SignUp = ({ route, navigation }: any) => {
 
         {step === 2 && (
           <>
-            <Animated.View entering={FadeInUp.delay(400).duration(1000).springify()} style={styles.inputBox}>
-              <TextInput
+            
+            <Animated.View entering={FadeInUp.delay(400).duration(1000).springify()} style={[styles.inputBox, {backgroundColor: 'transparent'}]}>
+              <TouchableOpacity 
+                onPress={pickImage}
+                style={styles.imagePicker}
+              >
+                {selectedImage ? (
+                  <Image
+                    source={{ uri: selectedImage }}
+                    style={styles.profileImage}
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <Image 
+                    source={{ uri: image }}
+                    style={styles.profileImage} 
+                  />
+                )}
+                <Text style={{alignSelf: 'center', color: 'skyblue', fontSize: 16}}>Tap to select a photo</Text>
+              </TouchableOpacity>
+              {/* <TextInput
                 placeholder="Image"
                 placeholderTextColor={'grey'}
                 value={image}
                 onChangeText={setImage}
-              />
+              /> */}
             </Animated.View>
             <Animated.View entering={FadeInUp.delay(600).duration(1000).springify()} style={[styles.inputBox, { marginBottom: 20 }]}>
               <TextInput
@@ -144,11 +188,11 @@ const SignUp = ({ route, navigation }: any) => {
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
-export default SignUp;
+export default SignUpScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -194,7 +238,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginLeft: 16,
     marginRight: 16,
-    
   },
   inputBox: {
     backgroundColor: 'rgba(0, 0, 0, 0.05)',
@@ -219,5 +262,17 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'white',
     textAlign: 'center',
+  },
+  imagePicker: {
+    justifyContent: 'center',
+    marginBottom: 10,
+  },
+  profileImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 100,
+    marginBottom: 10,
+    alignSelf: 'center',
+    marginVertical: 30,
   },
 });

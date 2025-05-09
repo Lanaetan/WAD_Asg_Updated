@@ -23,9 +23,6 @@ const CreateScreen = () => {
   const [showDraftMessage, setShowDraftMessage] = useState(false);
   const slideAnim = useState(new Animated.Value(-50))[0]; // starts off-screen
 
-
-  const { user } = useAuth();
-
   const {
     caption,
     setCaption,
@@ -36,6 +33,8 @@ const CreateScreen = () => {
     pickImage,
     createPost,
   } = useCreatePost();
+
+  const { user } = useAuth();
 
   // Load draft when screen mounts
   useEffect(() => {
@@ -91,21 +90,7 @@ const CreateScreen = () => {
 
       {/* Animated Draft Message */}
       {draftLoaded && (
-        <Animated.View
-          style={{
-            marginHorizontal: 50,
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            backgroundColor: '#c8e6c9',
-            borderRadius: 10,
-            paddingVertical: 10,
-            paddingHorizontal: 15,
-            transform: [{ translateY: slideAnim }],
-            zIndex: 9999,
-          }}
-        >
+        <Animated.View style={[styles.draftMessage, { transform: [{ translateY: slideAnim }] }]}>
           <Text style={{ color: '#2e7d32', textAlign: 'center', fontWeight: '500' }}>
             Previous draft loaded
           </Text>
