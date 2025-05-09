@@ -16,7 +16,15 @@ import WeatherApp from '../components/PostListItem/Weather';
 import styles from '../assets/styles/HomeScreen.style';
 
 const HomeScreen = () => {
-  const [posts, setPosts] = useState([]);
+  interface Post {
+    id: string;
+    image: string;
+    caption: string;
+    created_at: string;
+    user_id: string;
+  }
+  
+  const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
