@@ -19,7 +19,7 @@ import { uploadImageToCloudinary } from '../utils/cloudinary';
 
 const EditProfileScreen = () => {
   const navigation = useNavigation();
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [bio, setBio] = useState('');
@@ -61,6 +61,9 @@ const EditProfileScreen = () => {
 
       const db = await getDBConnection();
       await updateUserById(db, user.id, name, username, bio, imageUrl);
+
+      await refreshUser(); 
+      
       Alert.alert('Success', 'Profile Updated Successfully!');
       navigation.goBack();
 
