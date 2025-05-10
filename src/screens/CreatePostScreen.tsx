@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import { useCreatePost } from '../contexts/Post/CreatePostContext';
 import { useAuth } from '../contexts/AuthContext';
-import styles from '../assets/styles/createPost.style';
+import styles from '../assets/styles/CreatePost.style';
 import { deleteDraftFile, loadDraftFromFile, saveDraftToFile } from '../services/draftService';
 
 const CreateScreen = () => {
