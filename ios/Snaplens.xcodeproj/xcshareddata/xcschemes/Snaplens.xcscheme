@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "testdb.app"
-               BlueprintName = "testdb"
-               ReferencedContainer = "container:testdb.xcodeproj">
+               BuildableName = "Snaplens.app"
+               BlueprintName = "Snaplens"
+               ReferencedContainer = "container:Snaplens.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "testdbTests.xctest"
-               BlueprintName = "testdbTests"
-               ReferencedContainer = "container:testdb.xcodeproj">
+               BuildableName = "SnaplensTests.xctest"
+               BlueprintName = "SnaplensTests"
+               ReferencedContainer = "container:Snaplens.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "testdb.app"
-            BlueprintName = "testdb"
-            ReferencedContainer = "container:testdb.xcodeproj">
+            BuildableName = "Snaplens.app"
+            BlueprintName = "Snaplens"
+            ReferencedContainer = "container:Snaplens.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "testdb.app"
-            BlueprintName = "testdb"
-            ReferencedContainer = "container:testdb.xcodeproj">
+            BuildableName = "Snaplens.app"
+            BlueprintName = "Snaplens"
+            ReferencedContainer = "container:Snaplens.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
