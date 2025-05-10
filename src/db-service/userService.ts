@@ -1,26 +1,25 @@
 import {SQLiteDatabase} from 'react-native-sqlite-storage';
 
-export const getUsers = async( db: SQLiteDatabase ): Promise<any> => {
-    try{
-        const usersData : any = [];
-        const query = `SELECT * FROM users ORDER BY name`;
-        const results = await db.executeSql(query);
-        results.forEach((result: any) => {
-            (result.rows.raw()).forEach(( item:any ) => {
-                usersData.push(item);
-            })
-          });
-        return usersData;
-      } catch (error) {
-        console.error(error);
-        throw Error('Failed to get users !!!');
-      }
-}
-
+export const getUsers = async (db: SQLiteDatabase): Promise<any> => {
+  try {
+    const usersData: any = [];
+    const query = `SELECT * FROM users ORDER BY name`;
+    const results = await db.executeSql(query);
+    results.forEach((result: any) => {
+      result.rows.raw().forEach((item: any) => {
+        usersData.push(item);
+      });
+    });
+    return usersData;
+  } catch (error) {
+    console.error(error);
+    throw Error('Failed to get users !!!');
+  }
+};
 
 export const getUsersExceptCurrent = async (
   db: SQLiteDatabase,
-  currentUserId: string
+  currentUserId: string,
 ): Promise<any[]> => {
   try {
     const usersData: any[] = [];
@@ -39,51 +38,55 @@ export const getUsersExceptCurrent = async (
   }
 };
 
+export const getUserById = async (
+  db: SQLiteDatabase,
+  userId: string,
+): Promise<any> => {
+  try {
+    const userData: any = [];
+    const query = `SELECT * FROM users WHERE id=?`;
+    const results = await db.executeSql(query, [userId]);
+    return results[0].rows.item(0);
+  } catch (error) {
+    console.error(error);
+    throw Error('Failed to get user !!!');
+  }
+};
 
-export const getUserById = async( db: SQLiteDatabase, userId: string ): Promise<any> => {
-    try{
-        const userData : any = [];
-        const query = `SELECT * FROM users WHERE id=?`;
-        const results = await db.executeSql(query,[userId]);
-        return results[0].rows.item(0)
-      } catch (error) {
-        console.error(error);
-        throw Error('Failed to get user !!!');
-      }
-}
+export const getUserByEmail = async (
+  db: SQLiteDatabase,
+  email: string,
+): Promise<any> => {
+  try {
+    const userData: any = [];
+    const query = `SELECT * FROM users WHERE email=?`;
+    const results = await db.executeSql(query, [email]);
+    return results[0].rows.item(0);
+  } catch (error) {
+    console.error(error);
+    throw Error('Failed to get user !!!');
+  }
+};
 
-
-export const getUserByEmail = async( db: SQLiteDatabase, email: string ): Promise<any> => {
-  try{
-      const userData : any = [];
-      const query = `SELECT * FROM users WHERE email=?`;
-      const results = await db.executeSql(query,[email]);
-      return results[0].rows.item(0)
-    } catch (error) {
-      console.error(error);
-      throw Error('Failed to get user !!!');
-    }
-}
-
-
-export const createUser = async( 
-        db: SQLiteDatabase,
-        name: string,
-        username: string,
-        password: string,
-        email : string,
-        image: string,
-        bio: string
-    ) => {
-    try{
-        const query = 'INSERT INTO users(name,username,password,email,image,bio) VALUES(?,?,?,?,?,?)';
-        const parameters = [name,username,password,email,image,bio]
-        await db.executeSql(query,parameters);
-      } catch (error) {
-        console.error(error);
-        throw Error('Failed to create user !!!');
-      }
-}
+export const createUser = async (
+  db: SQLiteDatabase,
+  name: string,
+  username: string,
+  password: string,
+  email: string,
+  image: string,
+  bio: string,
+) => {
+  try {
+    const query =
+      'INSERT INTO users(name,username,password,email,image,bio) VALUES(?,?,?,?,?,?)';
+    const parameters = [name, username, password, email, image, bio];
+    await db.executeSql(query, parameters);
+  } catch (error) {
+    console.error(error);
+    throw Error('Failed to create user !!!');
+  }
+};
 
 export const updateUserById = async (
   db: SQLiteDatabase,
@@ -91,28 +94,44 @@ export const updateUserById = async (
   name: string,
   username: string,
   bio: string,
-  image: string
+  image: string,
 ) => {
   try {
-    const query = 'UPDATE users SET name=?, username=?, bio=?, image=? WHERE id=?';
+    const query =
+      'UPDATE users SET name=?, username=?, bio=?, image=? WHERE id=?';
     const parameters = [name, username, bio, image, userID];
     await db.executeSql(query, parameters);
   } catch (error) {
     console.error(error);
-    throw new Error('Failed to update user by ID!');  
+    throw new Error('Failed to update user by ID!');
   }
 };
 
+export const deleteUser = async (db: SQLiteDatabase, userId: string) => {
+  try {
+    const query = 'DELETE FROM users WHERE id = ?';
+    await db.executeSql(query, [userId]);
+  } catch (error) {
+    console.error(error);
+    throw Error('Failed to delete user !!!');
+  }
+};
 
-export const deleteUser = async( 
-    db: SQLiteDatabase,
-    userId: string
-    ) => {
-    try{
-        const query = 'DELETE FROM users WHERE id = ?' ;
-        await db.executeSql(query,[userId]);
-    } catch (error) {
-        console.error(error);
-        throw Error('Failed to delete user !!!');
+export const authenticateUser = async (
+  db: SQLiteDatabase,
+  email: string,
+  password: string,
+): Promise<any | null> => {
+  try {
+    const query =
+      'SELECT * FROM users WHERE email = ? AND password = ? LIMIT 1';
+    const results = await db.executeSql(query, [email, password]);
+    if (results[0].rows.length > 0) {
+      return results[0].rows.item(0);
     }
-}
+    return null;
+  } catch (error) {
+    console.error('Error authenticating user:', error);
+    throw new Error('Failed to authenticate user.');
+  }
+};
