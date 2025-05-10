@@ -88,14 +88,14 @@ const SignInScreen = ({ route, navigation }: any) => {
             </View>
           ) : (
             <TouchableOpacity style={styles.button} onPress={handleLogin}>
-              <Text style={styles.buttonText}>SignIn</Text>
+              <Text style={styles.buttonText}>Sign In</Text>
             </TouchableOpacity>
           )}
         </Animated.View>
 
         <Animated.View entering={FadeInUp.delay(600).duration(1000).springify()} style={{ flexDirection: 'row', justifyContent: 'center' }}>
           <Text>Don't have an account? </Text>
-          <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+          <TouchableOpacity onPress={() => navigation.navigate('Sign Up')}>
             <Text style={{ color: '#0284c7' }}>Sign Up</Text>
           </TouchableOpacity>
         </Animated.View>

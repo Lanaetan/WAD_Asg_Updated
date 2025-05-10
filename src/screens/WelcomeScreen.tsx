@@ -38,11 +38,11 @@ export default function WelcomeScreen({navigation}: any) {
           <View style={{marginHorizontal: 20,marginBottom: 80, }}>
             <Animated.Text  entering={FadeInUp.duration(1000).springify()} style={styles.text}>Welcome</Animated.Text>
 
-            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('SignIn')}>
+            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Sign In')}>
               <Text style={styles.signup}>Sign In</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('SignUp')}>
+            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Sign Up')}>
               <Text style={styles.signup}>Sign Up</Text>
             </TouchableOpacity>
           </View>

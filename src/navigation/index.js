@@ -37,21 +37,11 @@ const Navigator = () => {
               component={DrawerNavigator}
               options={{ headerShown: false }}
             />
-            <Stack.Screen 
-              name="BottomTabs" 
-              component={BottomTabNavigator} />
-            <Stack.Screen 
-              name="UserProfile" 
-              component={UserProfileScreen} />
-            <Stack.Screen 
-              name="Followers" 
-              component={FollowersScreen} />
-            <Stack.Screen 
-              name="Chat" 
-              component={ChatScreen} />
-            <Stack.Screen 
-              name="EditProfile" 
-              component={EditProfileScreen} />
+            <Stack.Screen name="BottomTabs" component={BottomTabNavigator} />
+            <Stack.Screen name="UserProfile" component={UserProfileScreen} />
+            <Stack.Screen name="Followers" component={FollowersScreen} />
+            <Stack.Screen name="Chat" component={ChatScreen} />
+            <Stack.Screen name="EditProfile" component={EditProfileScreen} />
           </>
         ) : (
           <>
@@ -60,12 +50,8 @@ const Navigator = () => {
               component={WelcomeScreen}
               options={{ headerShown: false }}
             />
-            <Stack.Screen 
-              name="SignIn" 
-              component={SignInScreen} />
-            <Stack.Screen 
-              name="SignUp" 
-              component={SignUpScreen} />
+            <Stack.Screen name="Sign In" component={SignInScreen} />
+            <Stack.Screen name="Sign Up" component={SignUpScreen} />
           </>
         )}
       </Stack.Navigator>

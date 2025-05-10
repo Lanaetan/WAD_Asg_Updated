@@ -58,7 +58,7 @@ const SignUpScreen = ({ navigation }: any) => {
         Alert.alert('Sign Up', response.message);
       } else {
         Alert.alert('Sign Up Successful', 'Please sign in with your credentials');
-        navigation.navigate('SignIn');
+        navigation.navigate('Sign In');
       }
     } catch (error) {
       console.error('Create user error:', error);
@@ -183,7 +183,7 @@ const SignUpScreen = ({ navigation }: any) => {
 
         <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 10 }}>
           <Text>Already have an account? </Text>
-          <TouchableOpacity onPress={() => navigation.navigate('SignIn')}>
+          <TouchableOpacity onPress={() => navigation.navigate('Sign In')}>
             <Text style={{ color: '#0284c7' }}>Sign In</Text>
           </TouchableOpacity>
         </View>

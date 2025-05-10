@@ -16,7 +16,7 @@ export const uploadImageToCloudinary = async (imageUri) => {
       const json = await res.json();
       console.log('Cloudinary Upload Response:', json);
   
-      return json.secure_url.replace('/upload/', '/upload/c_fill,g_auto,w_800,h_300,q_auto/');
+      return json.secure_url;
     } catch (err) {
       console.error('Cloudinary Upload Error:', err);
       return null;
