@@ -231,13 +231,15 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     letterSpacing: 1,
-    fontSize: 40,
+    fontSize: 30,
+    marginTop: 50,
   },
   formContainer: {
     flex: 1,
     alignItems: 'center',
     marginLeft: 16,
     marginRight: 16,
+    marginTop: 150
   },
   inputBox: {
     backgroundColor: 'rgba(0, 0, 0, 0.05)',
