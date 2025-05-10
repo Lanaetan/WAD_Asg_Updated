@@ -85,27 +85,6 @@ export const createUser = async(
       }
 }
 
-export const updateUser = async( 
-    db: SQLiteDatabase,
-    name: string,
-    username: string,
-    password: string,
-    email : string,
-    image: string,
-    bio: string,
-    userID: string
-) => {
-try{
-    const query = 'UPDATE users SET name=?,username=?,password=?,email=?,image=?,bio=? WHERE id=?';
-    const parameters = [name,username,password,email,image,bio, userID]
-    await db.executeSql(query,parameters);
-  } catch (error) {
-    console.error(error);
-    throw Error('Failed to update user !!!');
-  }
-}
-
-
 export const updateUserById = async (
   db: SQLiteDatabase,
   userID: string,
