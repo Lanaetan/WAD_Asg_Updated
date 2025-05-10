@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
+  Button,
 } from "react-native";
 import PostList from '../components/PostList'; 
 import { getDBConnection } from "../db-service/database";
@@ -126,19 +127,25 @@ const UserProfileScreen = ({ route, navigation }: any) => {
           <Text style={styles.bio}>{searchedUser.bio}</Text>
         </View>
 
-        {searchedUser.id !== user.id && (
+        {searchedUser.id !== user.id ? (
           <View style={styles.followButtonContainer}>
             <TouchableOpacity
               onPress={handleFollowToggle}
               style={[
                 styles.followButton,
-                { backgroundColor: isFollowing ? "white" : "#0095f6", borderWidth: 1, borderColor: "#0095f6" },
+                { backgroundColor: isFollowing ? "white" : "#0095f6", 
+                  borderWidth: 1, 
+                  borderColor: "#0095f6" },
               ]}
             >
               <Text style={{ color: isFollowing ? "#0095f6" : "white" }}>
                 {isFollowing ? "Unfollow" : "Follow"}
               </Text>
             </TouchableOpacity>
+          </View>
+        ): (
+          <View style={styles.followButtonContainer}>
+            <Button title="Edit Profile" onPress={()=>navigation.navigate('EditProfile')} />
           </View>
         )}
       </View>

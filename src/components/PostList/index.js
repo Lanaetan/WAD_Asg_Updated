@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Image, StyleSheet, Dimensions, FlatList } from 'react-native';
+import { View, Image, Dimensions, FlatList } from 'react-native';
+import styles from './styles';
 
 const numColumns = 3;
 const screenWidth = Dimensions.get('window').width;
@@ -23,18 +24,5 @@ const PostList = ({posts}) => {
 }
 
 export default PostList;
-
-const styles = StyleSheet.create({
-  itemContainer: {
-    width: itemSize,
-    height: itemSize,
-    margin: padding,
-  },
-  image: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
-  },
-}); 
 
 

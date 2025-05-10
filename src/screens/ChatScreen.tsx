@@ -7,7 +7,6 @@ import { useAuth } from "../contexts/AuthContext";
 import { getDBConnection } from "../db-service/database";
 import { createMessage, getMessagesBetween } from "../db-service/messageService";
 import { useSocket } from "../contexts/SocketContext";
-// import socket from "../utils/socket";
 
 LogBox.ignoreLogs([
   'Non-serializable values were found in the navigation state',

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useRef, ReactNode, useState } from 'react';
 import { ToastAndroid } from 'react-native';
-import io, { Socket } from 'socket.io-client';
+import io from 'socket.io-client';
 
 const SocketContext = createContext(null);
 

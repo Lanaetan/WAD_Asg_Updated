@@ -14,7 +14,6 @@ import {
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Feather from "react-native-vector-icons/Feather";
 import AntDesign from "react-native-vector-icons/AntDesign";
-// import socket from "../utils/socket";
 import ChatsScreen from "../screens/ChatsScreen";
 import BottomTabNavigator from "./BottomTabNavigator";
 import { AuthContext } from "../contexts/AuthContext";

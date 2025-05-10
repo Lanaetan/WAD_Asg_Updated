@@ -104,6 +104,8 @@ try{
     throw Error('Failed to update user !!!');
   }
 }
+
+
 export const updateUserById = async (
   db: SQLiteDatabase,
   userID: string,
@@ -118,7 +120,7 @@ export const updateUserById = async (
     await db.executeSql(query, parameters);
   } catch (error) {
     console.error(error);
-    throw new Error('Failed to update user by ID!');  // Changed to 'new Error'
+    throw new Error('Failed to update user by ID!');  
   }
 };
 
